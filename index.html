@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>VYX</title>
+<style>
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000}
+  #bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover}
+</style>
+</head>
+<body>
+  <!-- Vidéo plein écran en boucle (muette pour l'autoplay du navigateur). -->
+  <video id="bg" autoplay loop muted playsinline>
+    <source src="assets/video.mp4" type="video/mp4">
+  </video>
+
+  <!-- Son en boucle. -->
+  <audio id="snd" loop autoplay preload="auto">
+    <source src="assets/son.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // Le navigateur GMod (CEF) autorise l'autoplay -> le son part tout seul en jeu.
+    // (Un navigateur de bureau le bloque : c'est normal, teste EN JEU.)
+    // On multiplie les tentatives pour être sûr qu'elle parte dès que possible.
+    var a = document.getElementById('snd');
+    function go(){ if (a) { var p = a.play(); if (p && p.catch) p.catch(function(){}); } }
+
+    go();                                             // tout de suite
+    if (a) a.addEventListener('canplay', go);         // dès que l'audio est prêt
+    if (a) a.addEventListener('loadeddata', go);
+    document.addEventListener('DOMContentLoaded', go);
+    window.addEventListener('load', go);
+
+    // ré-essais pendant ~8 s (au cas où l'audio n'est pas encore chargé)
+    var tries = 0;
+    var iv = setInterval(function(){
+      go();
+      if (++tries > 20 || (a && !a.paused && a.currentTime > 0)) clearInterval(iv);
+    }, 400);
+
+    // filet ultime : si jamais bloqué, démarre à la moindre interaction
+    ['click','keydown','mousemove','touchstart'].forEach(function(e){
+      document.addEventListener(e, go);
+    });
+  </script>
+</body>
+</html>

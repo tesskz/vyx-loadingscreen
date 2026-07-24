@@ -4,15 +4,14 @@
 <meta charset="utf-8">
 <title>VYX</title>
 <style>
-  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000}
+  /* Fond gris clair (= couleur de l'image) : évite tout flash noir avant chargement. */
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#e6e8ea}
   #bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 <body>
-  <!-- Vidéo plein écran en boucle (muette pour l'autoplay du navigateur). -->
-  <video id="bg" autoplay loop muted playsinline preload="auto">
-    <source src="assets/video.mp4" type="video/mp4">
-  </video>
+  <!-- Image fixe plein écran (remplace l'ancienne vidéo : plus aucun risque d'écran noir). -->
+  <img id="bg" src="assets/photo.jpg" alt="">
 
   <!-- Son en boucle. -->
   <audio id="snd" loop autoplay preload="auto">
@@ -21,30 +20,28 @@
 
   <script>
     // L'attribut "autoplay" seul ne suffit pas toujours dans le navigateur GMod :
-    // on force la lecture de la VIDÉO **et** du SON, avec ré-essais (c'est ce qui
-    // corrigeait l'écran noir). Son à 10 %.
+    // on force la lecture du son avec ré-essais. Volume à 3 %.
+    var VOL = 0.03;
     var a = document.getElementById('snd');
-    var v = document.getElementById('bg');
-    if (a) a.volume = 0.10;   // volume à 10 %
+    if (a) a.volume = VOL;
 
     function go(){
-      if (v) { var pv = v.play(); if (pv && pv.catch) pv.catch(function(){}); }
-      if (a) { a.volume = 0.10; var pa = a.play(); if (pa && pa.catch) pa.catch(function(){}); }
+      if (!a) return;
+      a.volume = VOL;              // re-appliqué : certains navigateurs le réinitialisent
+      var p = a.play();
+      if (p && p.catch) p.catch(function(){});
     }
 
     go();
-    if (v){ v.addEventListener('canplay', go); v.addEventListener('loadeddata', go); }
     if (a){ a.addEventListener('canplay', go); a.addEventListener('loadeddata', go); }
     document.addEventListener('DOMContentLoaded', go);
     window.addEventListener('load', go);
 
-    // ré-essais pendant ~10 s (au cas où vidéo/son pas encore chargés)
+    // ré-essais pendant ~10 s (au cas où le son n'est pas encore chargé)
     var tries = 0;
     var iv = setInterval(function(){
       go();
-      var vOK = v && !v.paused && v.currentTime > 0;
-      var aOK = a && !a.paused && a.currentTime > 0;
-      if (++tries > 25 || (vOK && aOK)) clearInterval(iv);
+      if (++tries > 25 || (a && !a.paused && a.currentTime > 0)) clearInterval(iv);
     }, 400);
 
     // filet ultime : démarre à la moindre interaction

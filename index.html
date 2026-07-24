@@ -10,7 +10,7 @@
 </head>
 <body>
   <!-- Vidéo plein écran en boucle (muette pour l'autoplay du navigateur). -->
-  <video id="bg" autoplay loop muted playsinline>
+  <video id="bg" autoplay loop muted playsinline preload="auto">
     <source src="assets/video.mp4" type="video/mp4">
   </video>
 
@@ -20,27 +20,34 @@
   </audio>
 
   <script>
-    // Le navigateur GMod (CEF) autorise l'autoplay -> le son part tout seul en jeu.
-    // (Un navigateur de bureau le bloque : c'est normal, teste EN JEU.)
-    // On multiplie les tentatives pour être sûr qu'elle parte dès que possible.
+    // L'attribut "autoplay" seul ne suffit pas toujours dans le navigateur GMod :
+    // on force la lecture de la VIDÉO **et** du SON, avec ré-essais (c'est ce qui
+    // corrigeait l'écran noir). Son à 10 %.
     var a = document.getElementById('snd');
-    if (a) a.volume = 0.30;   // volume à 30 % (le fichier est très fort)
-    function go(){ if (a) { a.volume = 0.30; var p = a.play(); if (p && p.catch) p.catch(function(){}); } }
+    var v = document.getElementById('bg');
+    if (a) a.volume = 0.10;   // volume à 10 %
 
-    go();                                             // tout de suite
-    if (a) a.addEventListener('canplay', go);         // dès que l'audio est prêt
-    if (a) a.addEventListener('loadeddata', go);
+    function go(){
+      if (v) { var pv = v.play(); if (pv && pv.catch) pv.catch(function(){}); }
+      if (a) { a.volume = 0.10; var pa = a.play(); if (pa && pa.catch) pa.catch(function(){}); }
+    }
+
+    go();
+    if (v){ v.addEventListener('canplay', go); v.addEventListener('loadeddata', go); }
+    if (a){ a.addEventListener('canplay', go); a.addEventListener('loadeddata', go); }
     document.addEventListener('DOMContentLoaded', go);
     window.addEventListener('load', go);
 
-    // ré-essais pendant ~8 s (au cas où l'audio n'est pas encore chargé)
+    // ré-essais pendant ~10 s (au cas où vidéo/son pas encore chargés)
     var tries = 0;
     var iv = setInterval(function(){
       go();
-      if (++tries > 20 || (a && !a.paused && a.currentTime > 0)) clearInterval(iv);
+      var vOK = v && !v.paused && v.currentTime > 0;
+      var aOK = a && !a.paused && a.currentTime > 0;
+      if (++tries > 25 || (vOK && aOK)) clearInterval(iv);
     }, 400);
 
-    // filet ultime : si jamais bloqué, démarre à la moindre interaction
+    // filet ultime : démarre à la moindre interaction
     ['click','keydown','mousemove','touchstart'].forEach(function(e){
       document.addEventListener(e, go);
     });

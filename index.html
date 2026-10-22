@@ -6,65 +6,40 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  /* Une planche de manga : l'image dans une case cerclée d'encre, l'interface dans la gouttière
-     du bas, à l'encre noire sur le papier. Pas de dégradé, pas de lueur. */
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #efede8; }
-  body { color: #0d0d0d; font-family: "IBM Plex Mono", Consolas, monospace; }
+  /* L'image plein écran, telle quelle (jamais déformée, rien de dessiné dessus) ; une fine interface
+     posée en bas, sur la ville sombre : pourcentage, étape, serveur, la jauge et l'araignée de la Brigade. */
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+  body { color: #fff; font-family: "IBM Plex Mono", Consolas, monospace; }
+  #bg { position: fixed; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
 
-  #case {
-    position: absolute; left: 2.2vh; right: 2.2vh; top: 2.2vh; bottom: 17vh;
-    border: 0.45vh solid #0d0d0d; overflow: hidden; background: #e6e8ea;
-  }
-  /* calée en haut : le logo VYX de l'image ne doit jamais être rogné */
-  #case img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; }
+  #ui { position: fixed; left: 4.4vh; right: 4.4vh; bottom: 4.6vh; height: 9vh; text-shadow: 0 0.1vh 0.3vh rgba(0, 0, 0, 0.55); }
 
-  #gouttiere { position: absolute; left: 2.2vh; right: 2.2vh; bottom: 2.2vh; height: 12.6vh; }
-
-  /* le pourcentage, en gros, comme un chiffre de chapitre */
   #pct {
-    position: absolute; left: 0; bottom: 4.6vh;
-    font-family: Anton, Impact, "Arial Narrow", sans-serif; font-size: 8.4vh; line-height: 0.82;
-    letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+    position: absolute; left: 0; bottom: 3.3vh;
+    font-family: Anton, Impact, "Arial Narrow", sans-serif; font-size: 5.6vh; line-height: 0.82; font-variant-numeric: tabular-nums;
   }
-  #pct small { font-size: 3.4vh; margin-left: 0.3vh; vertical-align: top; }
+  #pct small { font-size: 2.2vh; margin-left: 0.25vh; vertical-align: top; }
+  #etat { position: absolute; left: 11.5vh; bottom: 3.5vh; right: 42%; white-space: nowrap; }
+  #phase { font-family: Anton, Impact, "Arial Narrow", sans-serif; font-size: 2.1vh; letter-spacing: 0.14em; text-transform: uppercase; }
+  #detail { font-size: 1.3vh; margin-top: 0.45vh; overflow: hidden; text-overflow: ellipsis; opacity: 0.6; }
+  #infos { position: absolute; right: 0; bottom: 3.5vh; text-align: right; font-size: 1.3vh; line-height: 1.6; }
+  #infos b { display: block; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: normal; font-size: 2.1vh;
+             letter-spacing: 0.1em; line-height: 1.1; text-transform: uppercase; }
+  #infos span { opacity: 0.6; }
 
-  #etat { position: absolute; left: 17vh; bottom: 5.2vh; right: 40%; white-space: nowrap; }
-  #phase {
-    font-family: Anton, Impact, "Arial Narrow", sans-serif; font-size: 2.9vh; letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  #detail { font-size: 1.45vh; margin-top: 0.5vh; overflow: hidden; text-overflow: ellipsis; opacity: 0.72; }
+  /* la jauge : un trait fin */
+  #jauge { position: absolute; left: 0; right: 0; bottom: 0; height: 0.42vh; background: rgba(255, 255, 255, 0.2); }
+  #plein { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #fff; }
 
-  #infos { position: absolute; right: 0; bottom: 5.2vh; text-align: right; font-size: 1.45vh; line-height: 1.55; }
-  #infos b {
-    display: block; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: normal;
-    font-size: 2.9vh; letter-spacing: 0.04em; line-height: 1.1; text-transform: uppercase;
-  }
-  #infos span { opacity: 0.72; }
-
-  /* « chargement » en japonais, posé en colonne comme une onomatopée */
-  #kana {
-    position: absolute; right: 0.2vh; top: -16.4vh; font-family: "Yu Gothic", "Meiryo", "MS Gothic", sans-serif;
-    font-weight: bold; font-size: 1.9vh; line-height: 1.05; width: 2vh; text-align: center; color: #efede8;
-    background: #0d0d0d; padding: 0.7vh 0.35vh;
-  }
-
-  /* la jauge : un trait d'encre, crantée tous les 10 % */
-  #jauge { position: absolute; left: 0; right: 0; bottom: 1.2vh; height: 1.3vh; border: 0.3vh solid #0d0d0d; }
-  #plein { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #0d0d0d; }
-  .cran { position: absolute; top: 0; bottom: 0; width: 0.3vh; background: #0d0d0d; opacity: 0.22; }
-
-  /* l'araignée de la Brigade, vue du dessus comme le tatouage (12 pattes, son numéro sur l'abdomen) :
-     à cheval sur la jauge, la tête au bout de ce qui est rempli ; un liseré papier la détache de l'encre */
-  #araignee { position: absolute; bottom: -1.65vh; left: 0; width: 7.6vh; height: 7.6vh; margin-left: -5.6vh; }
+  /* l'araignée : à cheval sur le trait, la tête au bout de la partie remplie */
+  #araignee { position: absolute; left: 0; bottom: -3.49vh; width: 7.4vh; height: 7.4vh; margin-left: -5.3vh; }
   #araignee svg { width: 100%; height: 100%; overflow: visible; }
 </style>
 </head>
 <body>
-  <div id="case"><img src="assets/photo.png" alt=""></div>
+  <img id="bg" src="assets/photo.png" alt="">
 
-  <div id="gouttiere">
-    <div id="kana">読<br>込<br>中</div>
+  <div id="ui">
     <div id="pct">0<small>%</small></div>
     <div id="etat">
       <div id="phase">Connexion</div>
@@ -74,19 +49,17 @@
       <b id="nom">VYX</b>
       <span id="carte">Hunter x Hunter RP</span>
     </div>
-
     <div id="jauge"><div id="plein"></div></div>
-
     <div id="araignee">
       <svg viewBox="-24 -24 48 48" aria-hidden="true">
-        <g id="liseres" fill="none" stroke="#efede8" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"></g>
-        <g id="pattes" fill="none" stroke="#0d0d0d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></g>
-        <g stroke="#efede8" stroke-width="1.6" fill="#0d0d0d">
-          <ellipse cx="-6.5" cy="0" rx="8.6" ry="6.8"/>
-          <ellipse cx="5" cy="0" rx="4.6" ry="3.9"/>
-          <circle cx="10.4" cy="0" r="2.5"/>
+        <g id="pattes" fill="#fff" stroke="#0b0b0b" stroke-width="0.7" stroke-linejoin="round"></g>
+        <g fill="#fff" stroke="#0b0b0b" stroke-width="0.8">
+          <path d="M -0.5 0 C -2 -6.6, -11 -7.6, -15 -3.4 C -17.2 -1.2, -17.2 1.2, -15 3.4 C -11 7.6, -2 6.6, -0.5 0 Z"/>
+          <ellipse cx="4.6" cy="0" rx="4.7" ry="3.5"/>
+          <ellipse cx="9.6" cy="0" rx="2.3" ry="2"/>
+          <path d="M 11.2 -1.6 Q 13.6 -2.2 13.4 -0.4 Q 12.4 -0.9 11.4 -0.6 Z M 11.2 1.6 Q 13.6 2.2 13.4 0.4 Q 12.4 0.9 11.4 0.6 Z"/>
         </g>
-        <text x="-6.5" y="3.6" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="9.5" fill="#efede8">0</text>
+        <text x="-8.4" y="3.3" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="9" fill="#0b0b0b">0</text>
       </svg>
     </div>
   </div>
@@ -122,14 +95,7 @@
     // ------------------------------------------------------------------ éléments
     function $(id) { return document.getElementById(id); }
     var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein');
-    var elAraignee = $('araignee'), elPattes = $('pattes'), elJauge = $('jauge');
-
-    for (var c = 1; c < 10; c++) {
-      var cr = document.createElement('div');
-      cr.className = 'cran';
-      cr.style.left = (c * 10) + '%';
-      elJauge.appendChild(cr);
-    }
+    var elAraignee = $('araignee'), elPattes = $('pattes');
 
     // ------------------------------------------------------------------ l'avancement
     // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage,
@@ -187,32 +153,44 @@
       texte(elDetail, s);
     };
 
-    // ------------------------------------------------------------------ l'araignée : 12 pattes, marche alternée
-    // Vue du dessus, la tête vers la droite (le sens de la jauge). Chaque patte part du céphalothorax,
-    // plie au genou et pose son pied loin du corps ; les avant pointent vers l'avant, les arrière vers l'arrière.
-    var SVGNS = 'http://www.w3.org/2000/svg', elLiseres = $('liseres');
+    // ------------------------------------------------------------------ l'araignée : 12 pattes effilées
+    // Vue du dessus, la tête vers la droite (le sens de la jauge). Chaque patte : une cuisse épaisse jusqu'au
+    // genou, puis un tibia qui s'affine en pointe ; les avant visent l'avant, les arrière l'arrière.
+    var SVGNS = 'http://www.w3.org/2000/svg';
     var PATTES = [];
-    var RACINE = [8.5, 7, 5.5, 4, 2.5, 1];          // de l'avant vers l'arrière, le long du céphalothorax
-    var PIED   = [21, 15, 7, -3, -12, -19];         // x du pied
+    var RACINE = [7.5, 6.3, 5.0, 3.8, 2.6, 1.4];
+    var GENOU  = [[14, 8.5], [11, 12], [6.5, 13.8], [0, 13.8], [-5, 12], [-8.5, 8.5]];
+    var PIED   = [[24, 12.5], [19.5, 19], [9.5, 22.5], [-4, 22.5], [-14, 19], [-21.5, 12.5]];
     for (var k = 0; k < 6; k++) {
       for (var side = -1; side <= 1; side += 2) {
-        var under = document.createElementNS(SVGNS, 'polyline'), top = document.createElementNS(SVGNS, 'polyline');
-        elLiseres.appendChild(under); elPattes.appendChild(top);
-        PATTES.push({ els: [under, top], x0: RACINE[k], fx: PIED[k], side: side, phase: (k + (side > 0 ? 1 : 0)) % 2 });
+        var el = document.createElementNS(SVGNS, 'path');
+        elPattes.appendChild(el);
+        PATTES.push({ el: el, x0: RACINE[k], kx: GENOU[k], fx: PIED[k], side: side, k: k, phase: (k + (side > 0 ? 1 : 0)) % 2 });
       }
     }
+    function nrm(ax, ay, bx, by) { var dx = bx - ax, dy = by - ay, l = Math.sqrt(dx * dx + dy * dy) || 1; return [-dy / l, dx / l]; }
+    function f1(v) { return v.toFixed(2); }
     var marche = 0;
     function dessinePattes(bouge) {
       for (var i = 0; i < PATTES.length; i++) {
         var P = PATTES[i];
         var t = marche + P.phase * Math.PI;
-        var sw = bouge ? Math.sin(t) * 2.6 : 0;                     // le pied avance puis recule
-        var fx = P.fx + sw, fy = P.side * (17 + (bouge ? Math.cos(t) * 0.8 : 0));
-        var kx = P.x0 + (fx - P.x0) * 0.42 + 1.2, ky = P.side * 11.5;
-        var pts = P.x0.toFixed(1) + ',' + (P.side * 3).toFixed(1) + ' ' + kx.toFixed(1) + ',' + ky.toFixed(1) + ' '
-                + fx.toFixed(1) + ',' + fy.toFixed(1);
-        P.els[0].setAttribute('points', pts);
-        P.els[1].setAttribute('points', pts);
+        var sw = bouge ? Math.sin(t) * 2.4 : 0;
+        var lift = bouge ? Math.max(0, Math.cos(t)) * 1.2 : 0;
+        var rx = P.x0, ry = P.side * 2.4;
+        var kx = P.kx[0] + sw * 0.45, ky = P.side * (P.kx[1] - lift * 0.4);
+        var fx = P.fx[0] + sw, fy = P.side * (P.fx[1] - lift);
+        var n0 = nrm(rx, ry, kx, ky), n1 = nrm(kx, ky, fx, fy);
+        var nk = [(n0[0] + n1[0]) / 2, (n0[1] + n1[1]) / 2];
+        var w0 = 1.35, wk = 1.0;
+        // le tibia se courbe un peu vers l'extérieur : point de contrôle décalé
+        var mx = (kx + fx) / 2 + n1[0] * P.side * -0.9, my = (ky + fy) / 2 + n1[1] * P.side * -0.9;
+        var d = 'M' + f1(rx + n0[0] * w0) + ' ' + f1(ry + n0[1] * w0)
+              + 'L' + f1(kx + nk[0] * wk) + ' ' + f1(ky + nk[1] * wk)
+              + 'Q' + f1(mx + n1[0] * 0.45) + ' ' + f1(my + n1[1] * 0.45) + ' ' + f1(fx) + ' ' + f1(fy)
+              + 'Q' + f1(mx - n1[0] * 0.45) + ' ' + f1(my - n1[1] * 0.45) + ' ' + f1(kx - nk[0] * wk) + ' ' + f1(ky - nk[1] * wk)
+              + 'L' + f1(rx - n0[0] * w0) + ' ' + f1(ry - n0[1] * w0) + 'Z';
+        P.el.setAttribute('d', d);
       }
     }
 
@@ -261,7 +239,7 @@
           SetFilesTotal(total);
           var left = Math.max(0, Math.round(total * (1 - (s - 1.5) / 7.5)));
           SetFilesNeeded(left);
-          DownloadingFile('materials/vyx/boutique/bq2_fond_v' + (left % 7 + 1) + '.jpg');
+          DownloadingFile('materials/vyx/hud/hud_bar_v' + (left % 7 + 1) + '.png');
         } else if (s >= 9 && s < 11) SetStatusChanged('Mounting Addons');
         else if (s >= 11 && s < 12.5) SetStatusChanged('Sending client info...');
         else if (s >= 12.5 && s < 14) SetStatusChanged('Received all Lua files');

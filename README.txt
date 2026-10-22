@@ -49,9 +49,9 @@ NOTES
 --------------------------------------------------------------
 VERSION 2 (branche loading-v2)
 --------------------------------------------------------------
-* L'image est posee dans une "case" de manga (cadre noir sur papier) ;
-  le bas de l'ecran affiche le pourcentage, l'etape du chargement, le
-  fichier en cours, le nom du serveur / la carte / le mode.
+* L'image reste plein ecran, telle quelle ; une fine interface est posee
+  en bas : le pourcentage, l'etape du chargement, le fichier en cours,
+  le nom du serveur / la carte / le mode.
 * La jauge avance aussi pendant le Workshop et le Lua (GMod n'y donne
   pas de compte de fichiers) : elle ne reste jamais figee.
 * Une araignee de la Brigade Fantome marche au bout de la partie

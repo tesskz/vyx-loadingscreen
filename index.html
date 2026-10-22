@@ -3,15 +3,93 @@
 <head>
 <meta charset="utf-8">
 <title>VYX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  /* Fond gris clair (= couleur de l'image) : évite tout flash noir avant chargement. */
-  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#e6e8ea}
-  #bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover}
+  /* Une planche de manga : l'image dans une case cerclée d'encre, l'interface dans la gouttière
+     du bas, à l'encre noire sur le papier. Pas de dégradé, pas de lueur. */
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #efede8; }
+  body { color: #0d0d0d; font-family: "IBM Plex Mono", Consolas, monospace; }
+
+  #case {
+    position: absolute; left: 2.2vh; right: 2.2vh; top: 2.2vh; bottom: 17vh;
+    border: 0.45vh solid #0d0d0d; overflow: hidden; background: #e6e8ea;
+  }
+  /* calée en haut : le logo VYX de l'image ne doit jamais être rogné */
+  #case img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; }
+
+  #gouttiere { position: absolute; left: 2.2vh; right: 2.2vh; bottom: 2.2vh; height: 12.6vh; }
+
+  /* le pourcentage, en gros, comme un chiffre de chapitre */
+  #pct {
+    position: absolute; left: 0; bottom: 4.6vh;
+    font-family: Anton, Impact, "Arial Narrow", sans-serif; font-size: 8.4vh; line-height: 0.82;
+    letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  }
+  #pct small { font-size: 3.4vh; margin-left: 0.3vh; vertical-align: top; }
+
+  #etat { position: absolute; left: 17vh; bottom: 5.2vh; right: 40%; white-space: nowrap; }
+  #phase {
+    font-family: Anton, Impact, "Arial Narrow", sans-serif; font-size: 2.9vh; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  #detail { font-size: 1.45vh; margin-top: 0.5vh; overflow: hidden; text-overflow: ellipsis; opacity: 0.72; }
+
+  #infos { position: absolute; right: 0; bottom: 5.2vh; text-align: right; font-size: 1.45vh; line-height: 1.55; }
+  #infos b {
+    display: block; font-family: Anton, Impact, "Arial Narrow", sans-serif; font-weight: normal;
+    font-size: 2.9vh; letter-spacing: 0.04em; line-height: 1.1; text-transform: uppercase;
+  }
+  #infos span { opacity: 0.72; }
+
+  /* « chargement » en japonais, posé en colonne comme une onomatopée */
+  #kana {
+    position: absolute; right: 0.2vh; top: -16.4vh; font-family: "Yu Gothic", "Meiryo", "MS Gothic", sans-serif;
+    font-weight: bold; font-size: 1.9vh; line-height: 1.05; width: 2vh; text-align: center; color: #efede8;
+    background: #0d0d0d; padding: 0.7vh 0.35vh;
+  }
+
+  /* la jauge : un trait d'encre, crantée tous les 10 % */
+  #jauge { position: absolute; left: 0; right: 0; bottom: 1.2vh; height: 1.3vh; border: 0.3vh solid #0d0d0d; }
+  #plein { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #0d0d0d; }
+  .cran { position: absolute; top: 0; bottom: 0; width: 0.3vh; background: #0d0d0d; opacity: 0.22; }
+
+  /* l'araignée de la Brigade, vue du dessus comme le tatouage (12 pattes, son numéro sur l'abdomen) :
+     à cheval sur la jauge, la tête au bout de ce qui est rempli ; un liseré papier la détache de l'encre */
+  #araignee { position: absolute; bottom: -1.65vh; left: 0; width: 7.6vh; height: 7.6vh; margin-left: -5.6vh; }
+  #araignee svg { width: 100%; height: 100%; overflow: visible; }
 </style>
 </head>
 <body>
-  <!-- Image fixe plein écran (remplace l'ancienne vidéo : plus aucun risque d'écran noir). -->
-  <img id="bg" src="assets/photo.png" alt="">
+  <div id="case"><img src="assets/photo.png" alt=""></div>
+
+  <div id="gouttiere">
+    <div id="kana">読<br>込<br>中</div>
+    <div id="pct">0<small>%</small></div>
+    <div id="etat">
+      <div id="phase">Connexion</div>
+      <div id="detail">en attente du serveur…</div>
+    </div>
+    <div id="infos">
+      <b id="nom">VYX</b>
+      <span id="carte">Hunter x Hunter RP</span>
+    </div>
+
+    <div id="jauge"><div id="plein"></div></div>
+
+    <div id="araignee">
+      <svg viewBox="-24 -24 48 48" aria-hidden="true">
+        <g id="liseres" fill="none" stroke="#efede8" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="pattes" fill="none" stroke="#0d0d0d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g stroke="#efede8" stroke-width="1.6" fill="#0d0d0d">
+          <ellipse cx="-6.5" cy="0" rx="8.6" ry="6.8"/>
+          <ellipse cx="5" cy="0" rx="4.6" ry="3.9"/>
+          <circle cx="10.4" cy="0" r="2.5"/>
+        </g>
+        <text x="-6.5" y="3.6" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="9.5" fill="#efede8">0</text>
+      </svg>
+    </div>
+  </div>
 
   <!-- Son en boucle. -->
   <audio id="snd" loop autoplay preload="auto">
@@ -19,35 +97,179 @@
   </audio>
 
   <script>
-    // L'attribut "autoplay" seul ne suffit pas toujours dans le navigateur GMod :
-    // on force la lecture du son avec ré-essais. Volume à 3 %.
+  (function () {
+    // ------------------------------------------------------------------ le son (inchangé : 3 %, ré-essais)
     var VOL = 0.03;
     var a = document.getElementById('snd');
     if (a) a.volume = VOL;
-
-    function go(){
+    function go() {
       if (!a) return;
-      a.volume = VOL;              // re-appliqué : certains navigateurs le réinitialisent
+      a.volume = VOL;
       var p = a.play();
-      if (p && p.catch) p.catch(function(){});
+      if (p && p.catch) p.catch(function () {});
     }
-
     go();
-    if (a){ a.addEventListener('canplay', go); a.addEventListener('loadeddata', go); }
+    if (a) { a.addEventListener('canplay', go); a.addEventListener('loadeddata', go); }
     document.addEventListener('DOMContentLoaded', go);
     window.addEventListener('load', go);
-
-    // ré-essais pendant ~10 s (au cas où le son n'est pas encore chargé)
     var tries = 0;
-    var iv = setInterval(function(){
+    var iv = setInterval(function () {
       go();
       if (++tries > 25 || (a && !a.paused && a.currentTime > 0)) clearInterval(iv);
     }, 400);
+    ['click', 'keydown', 'mousemove', 'touchstart'].forEach(function (e) { document.addEventListener(e, go); });
 
-    // filet ultime : démarre à la moindre interaction
-    ['click','keydown','mousemove','touchstart'].forEach(function(e){
-      document.addEventListener(e, go);
-    });
+    // ------------------------------------------------------------------ éléments
+    function $(id) { return document.getElementById(id); }
+    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein');
+    var elAraignee = $('araignee'), elPattes = $('pattes'), elJauge = $('jauge');
+
+    for (var c = 1; c < 10; c++) {
+      var cr = document.createElement('div');
+      cr.className = 'cran';
+      cr.style.left = (c * 10) + '%';
+      elJauge.appendChild(cr);
+    }
+
+    // ------------------------------------------------------------------ l'avancement
+    // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage,
+    // Lua) n'arrive que par des messages d'état. Chaque étape pose un plancher et un plafond : la jauge
+    // avance d'elle-même vers le plafond (jamais figée), sans le dépasser avant l'étape suivante.
+    var S = { floor: 0.02, cap: 0.08, total: 0, needed: 0, creep: 0.02, shown: 0 };
+    function etape(floor, cap) {
+      if (floor > S.floor) S.floor = floor;
+      if (cap > S.cap) S.cap = cap;
+    }
+    function texte(el, t) { if (el.textContent !== t) el.textContent = t; }
+
+    var ETATS = [
+      [/retriev|parsing|server info/i, 'Connexion', 0.04, 0.12],
+      [/workshop|downloading|t[ée]l[ée]charg/i, 'Téléchargement', 0.12, 0.6],
+      [/mount|montage/i, 'Montage des addons', 0.62, 0.7],
+      [/sending client info/i, 'Envoi des infos', 0.72, 0.8],
+      [/client info sent/i, 'Infos envoyées', 0.8, 0.86],
+      [/lua files|received all/i, 'Fichiers Lua reçus', 0.86, 0.92],
+      [/starting lua|lua started/i, 'Démarrage du Lua', 0.92, 0.98]
+    ];
+
+    window.GameDetails = function (servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+      if (servername) texte($('nom'), servername);
+      var bits = [];
+      if (mapname) bits.push(mapname);
+      if (gamemode) bits.push(gamemode);
+      if (maxplayers) bits.push(maxplayers + ' places');
+      if (bits.length) texte($('carte'), bits.join('  ·  '));
+      etape(0.04, 0.12);
+    };
+    window.SetFilesTotal = function (n) { S.total = Math.max(0, +n || 0); };
+    window.SetFilesNeeded = function (n) { S.needed = Math.max(0, +n || 0); };
+    window.DownloadingFile = function (f) {
+      texte(elPhase, 'Téléchargement');
+      texte(elDetail, String(f || '').replace(/^.*[\\\/]/, '') + (S.total ? '   ' + (S.total - S.needed) + ' / ' + S.total : ''));
+      etape(0.12, 0.6);
+    };
+    window.SetStatusChanged = function (s) {
+      s = String(s || '');
+      for (var i = 0; i < ETATS.length; i++) {
+        var e = ETATS[i];
+        if (e[0].test(s)) {
+          texte(elPhase, e[1]);
+          etape(e[2], e[3]);
+          // « Downloading 3/40 » (Workshop) : la part de l'étape qui est faite
+          var m = s.match(/(\d+)\s*\/\s*(\d+)/);
+          if (e[1] === 'Téléchargement' && m && +m[2] > 0) {
+            var f = Math.min(1, +m[1] / +m[2]);
+            etape(0.12 + 0.48 * f, Math.min(0.6, 0.12 + 0.48 * (f + 1 / +m[2])));
+          }
+          break;
+        }
+      }
+      texte(elDetail, s);
+    };
+
+    // ------------------------------------------------------------------ l'araignée : 12 pattes, marche alternée
+    // Vue du dessus, la tête vers la droite (le sens de la jauge). Chaque patte part du céphalothorax,
+    // plie au genou et pose son pied loin du corps ; les avant pointent vers l'avant, les arrière vers l'arrière.
+    var SVGNS = 'http://www.w3.org/2000/svg', elLiseres = $('liseres');
+    var PATTES = [];
+    var RACINE = [8.5, 7, 5.5, 4, 2.5, 1];          // de l'avant vers l'arrière, le long du céphalothorax
+    var PIED   = [21, 15, 7, -3, -12, -19];         // x du pied
+    for (var k = 0; k < 6; k++) {
+      for (var side = -1; side <= 1; side += 2) {
+        var under = document.createElementNS(SVGNS, 'polyline'), top = document.createElementNS(SVGNS, 'polyline');
+        elLiseres.appendChild(under); elPattes.appendChild(top);
+        PATTES.push({ els: [under, top], x0: RACINE[k], fx: PIED[k], side: side, phase: (k + (side > 0 ? 1 : 0)) % 2 });
+      }
+    }
+    var marche = 0;
+    function dessinePattes(bouge) {
+      for (var i = 0; i < PATTES.length; i++) {
+        var P = PATTES[i];
+        var t = marche + P.phase * Math.PI;
+        var sw = bouge ? Math.sin(t) * 2.6 : 0;                     // le pied avance puis recule
+        var fx = P.fx + sw, fy = P.side * (17 + (bouge ? Math.cos(t) * 0.8 : 0));
+        var kx = P.x0 + (fx - P.x0) * 0.42 + 1.2, ky = P.side * 11.5;
+        var pts = P.x0.toFixed(1) + ',' + (P.side * 3).toFixed(1) + ' ' + kx.toFixed(1) + ',' + ky.toFixed(1) + ' '
+                + fx.toFixed(1) + ',' + fy.toFixed(1);
+        P.els[0].setAttribute('points', pts);
+        P.els[1].setAttribute('points', pts);
+      }
+    }
+
+    // ------------------------------------------------------------------ boucle
+    var last = Date.now();
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    function tick() {
+      var now = Date.now(), dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+
+      var files = 0;
+      if (S.total > 0) files = 0.12 + 0.48 * Math.min(1, (S.total - S.needed) / S.total);
+      var target = Math.max(S.floor, files);
+      // la jauge glisse d'elle-même vers le plafond de l'étape (de plus en plus lentement)
+      S.creep = Math.max(S.creep, target);
+      S.creep += (S.cap - S.creep) * Math.min(1, dt * 0.18);
+      var goal = Math.min(1, Math.max(target, S.creep));
+      var avant = S.shown;
+      S.shown += (goal - S.shown) * Math.min(1, dt * 5);
+      if (goal - S.shown < 0.0005) S.shown = goal;
+
+      var p = S.shown * 100;
+      elPlein.style.width = p.toFixed(2) + '%';
+      elAraignee.style.left = p.toFixed(2) + '%';
+      var n = Math.floor(p);
+      if (elPct.firstChild.nodeValue !== String(n)) elPct.firstChild.nodeValue = String(n);
+
+      // elle marche quand la jauge avance, au pas de sa vitesse ; immobile sinon
+      var vitesse = (S.shown - avant) / Math.max(dt, 0.001);
+      var bouge = vitesse > 0.002;
+      if (bouge) marche += dt * Math.min(16, 6 + vitesse * 160);
+      dessinePattes(bouge);
+      raf(tick);
+    }
+    dessinePattes(false);
+    tick();
+
+    // ------------------------------------------------------------------ démo hors jeu : index.html?demo
+    if (/[?&]demo/.test(location.search)) {
+      var t0 = Date.now(), total = 180;
+      GameDetails('VYX — Hunter x Hunter RP', '', 'rp_yorknew_city', 64, '', 'mangarp');
+      SetStatusChanged('Retrieving server info...');
+      var demo = setInterval(function () {
+        var s = (Date.now() - t0) / 1000;
+        if (s > 1.5 && s < 9) {
+          SetFilesTotal(total);
+          var left = Math.max(0, Math.round(total * (1 - (s - 1.5) / 7.5)));
+          SetFilesNeeded(left);
+          DownloadingFile('materials/vyx/boutique/bq2_fond_v' + (left % 7 + 1) + '.jpg');
+        } else if (s >= 9 && s < 11) SetStatusChanged('Mounting Addons');
+        else if (s >= 11 && s < 12.5) SetStatusChanged('Sending client info...');
+        else if (s >= 12.5 && s < 14) SetStatusChanged('Received all Lua files');
+        else if (s >= 14 && s < 16) SetStatusChanged('Starting Lua...');
+        else if (s >= 22) { clearInterval(demo); }
+      }, 250);
+    }
+  })();
   </script>
 </body>
 </html>

@@ -45,4 +45,16 @@ NOTES
   remplissent automatiquement (API de chargement GMod).
 * Poids : garde la video legere (< 15-20 Mo idealement) pour un
   chargement rapide chez les joueurs.
+
+--------------------------------------------------------------
+VERSION 2 (branche loading-v2)
+--------------------------------------------------------------
+* L'image est posee dans une "case" de manga (cadre noir sur papier) ;
+  le bas de l'ecran affiche le pourcentage, l'etape du chargement, le
+  fichier en cours, le nom du serveur / la carte / le mode.
+* La jauge avance aussi pendant le Workshop et le Lua (GMod n'y donne
+  pas de compte de fichiers) : elle ne reste jamais figee.
+* Une araignee de la Brigade Fantome marche au bout de la partie
+  remplie de la jauge (ses pattes bougent quand la jauge avance).
+* Apercu hors jeu : ouvrir index.html?demo (simule un chargement).
 ================================================================

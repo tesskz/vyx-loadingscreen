@@ -27,12 +27,9 @@
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0d0e14; }
   body { color: var(--texte); font-family: "Hind", "Segoe UI", sans-serif; font-weight: 600; }
 
-  /* le fond : l'illustration, qui respire très lentement */
-  #bg { position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 40%;
-        animation: souffle 34s ease-in-out infinite alternate; }
-  @keyframes souffle { from { transform: scale(1); } to { transform: scale(1.06); } }
+  /* le fond : l'illustration, fixe (rien ne s'anime sauf la jauge : GMod peine) */
+  #bg { position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
   #voile { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(13, 14, 20, 0.12); }
-  #poussiere { position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 
   /* un cadre : son dessin (SVG, recalculé à chaque taille) derrière son contenu */
   .cadre { position: absolute; }
@@ -40,13 +37,9 @@
 
   /* ---------------------------------------------------------------- la plaque du bas */
   /* le coin bas-droit est à GMod : sa boîte d'étapes (~400 × 75 px, collée au coin) s'affiche par-dessus */
-  #plaque { left: 4.4vh; width: calc(100% - 46vh); bottom: 3.8vh; height: 11.4vh;
-            animation: monte 0.9s cubic-bezier(.2, .8, .2, 1) both; }
-  @keyframes monte { from { opacity: 0; transform: translateY(2.4vh); } to { opacity: 1; transform: none; } }
+  #plaque { left: 4.4vh; width: calc(100% - 46vh); bottom: 3.8vh; height: 11.4vh; }
 
   #etoiles { position: absolute; left: 50%; top: 0; width: 24vh; height: 4.8vh; margin: -2.4vh 0 0 -12vh; overflow: visible; }
-  #etoiles .e { transform-box: fill-box; transform-origin: center; animation: pop 0.5s cubic-bezier(.3, 1.6, .5, 1) both; }
-  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
 
   #pct { position: absolute; left: 3.6vh; top: 1.5vh; font-family: "Lexend", sans-serif; font-weight: 600;
          font-size: 5.6vh; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
@@ -73,12 +66,9 @@
   #pointe svg { width: 100%; height: 100%; overflow: visible; }
 
   /* ---------------------------------------------------------------- l'astuce */
-  #astuce { right: 4.4vh; bottom: 30vh; width: 46vh; height: 9.6vh;
-            animation: monte 0.9s .25s cubic-bezier(.2, .8, .2, 1) both; }
+  #astuce { right: 4.4vh; bottom: 30vh; width: 46vh; height: 9.6vh; }
   #astuce .pil { position: absolute; left: 2.4vh; top: -1.5vh; }
-  #astuceTxt { position: absolute; left: 3vh; right: 3vh; top: 2.6vh; font-size: 1.75vh; line-height: 1.45;
-               transition: opacity .45s, transform .45s; }
-  #astuceTxt.sort { opacity: 0; transform: translateY(0.6vh); }
+  #astuceTxt { position: absolute; left: 3vh; right: 3vh; top: 2.6vh; font-size: 1.75vh; line-height: 1.45; }
   #astuceTxt b { font-family: "Lexend", sans-serif; font-weight: 600; color: var(--lav); }
 
   /* ---------------------------------------------------------------- les pilules (hexagonales) */
@@ -95,23 +85,18 @@
   .pil.lav { color: var(--sombre); }
   .pil.lav::before { background: var(--lav); }
 
-  #son { position: fixed; right: 4.4vh; top: 3.8vh; cursor: pointer; user-select: none; min-width: 13vh;
-         animation: monte 0.9s .4s cubic-bezier(.2, .8, .2, 1) both; }
+  #son { position: fixed; right: 4.4vh; top: 3.8vh; cursor: pointer; user-select: none; min-width: 13vh; }
   #son:hover::before { background: var(--pilule2); }
   #son.off { color: var(--dim); }
 
   /* écran étroit (4:3) : la plaque raccourcit, le serveur s'efface pour laisser l'étape lisible */
   @media (max-aspect-ratio: 3/2) { #infos { display: none; } #etat { right: 4vh; } }
 
-  @media (prefers-reduced-motion: reduce) {
-    #bg, #plaque, #astuce, #son, #etoiles .e { animation: none; }
-  }
 </style>
 </head>
 <body>
   <img id="bg" src="assets/kyzen.jpg" alt="">
   <div id="voile"></div>
-  <canvas id="poussiere"></canvas>
 
   <div class="pil" id="son" title="Couper ou remettre la musique"><span class="lo g"></span><span id="sonTxt">Musique</span><span class="lo d"></span></div>
 
@@ -240,7 +225,6 @@
                          : el('path', { d: losange(x, 0, dd >= mid ? 4.5 : 8.5) }, svg);
         p.setAttribute('fill', '#fff');
         p.setAttribute('class', 'e');
-        p.style.animationDelay = (0.5 + dd * 0.09) + 's';
       }
     })();
     $('etoile').setAttribute('d', etoile4(20, 5));
@@ -268,45 +252,16 @@
     var ia = Math.floor(Math.random() * ASTUCES.length);
     var elA = $('astuceTxt');
     elA.innerHTML = ASTUCES[ia];
-    setInterval(function () {
-      elA.classList.add('sort');
-      setTimeout(function () {
-        ia = (ia + 1) % ASTUCES.length;
-        elA.innerHTML = ASTUCES[ia];
-        elA.classList.remove('sort');
-      }, 450);
+    setInterval(function () {             // (sans fondu : GMod n'aime pas les animations)
+      ia = (ia + 1) % ASTUCES.length;
+      elA.innerHTML = ASTUCES[ia];
     }, 7000);
-
-    // ------------------------------------------------------------------ la poussière de givre (petits losanges)
-    var cv = $('poussiere'), cx = cv.getContext('2d');
-    var GRAINS = [];
-    function taille() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
-    taille();
-    window.addEventListener('resize', taille);
-    for (var g = 0; g < 34; g++) {
-      GRAINS.push({ x: Math.random(), y: Math.random(), s: 0.18 + Math.random() * 0.4, v: 0.008 + Math.random() * 0.02,
-                    a: 0.12 + Math.random() * 0.35, ph: Math.random() * 6.28 });
-    }
-    var calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    function poussiere(dt, t) {
-      var W = cv.width, H = cv.height, vh = H / 100;
-      cx.clearRect(0, 0, W, H);
-      for (var k = 0; k < GRAINS.length; k++) {
-        var p = GRAINS[k];
-        if (!calme) { p.y -= p.v * dt; if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); } }
-        var x = (p.x + Math.sin(t * 0.4 + p.ph) * 0.006) * W, y = p.y * H, s = p.s * vh;
-        cx.fillStyle = 'rgba(214,217,234,' + p.a + ')';
-        cx.beginPath();
-        cx.moveTo(x, y - s); cx.lineTo(x + s, y); cx.lineTo(x, y + s); cx.lineTo(x - s, y);
-        cx.closePath(); cx.fill();
-      }
-    }
 
     // ------------------------------------------------------------------ l'avancement (API de chargement GMod)
     // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage, Lua)
     // n'arrive que par des messages d'état. Chaque étape pose un plancher et un plafond : la jauge avance
     // d'elle-même vers le plafond (jamais figée), sans le dépasser avant l'étape suivante.
-    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein'), elPointe = $('pointe'), elEtoile = $('etoile');
+    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein'), elPointe = $('pointe');
     var S = { floor: 0.02, cap: 0.08, total: 0, needed: 0, creep: 0.02, shown: 0 };
     function etape(floor, cap) {
       if (floor > S.floor) S.floor = floor;
@@ -360,8 +315,8 @@
     };
 
     // ------------------------------------------------------------------ la boucle
-    var last = Date.now(), t0 = last, rot = 0;
-    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    // ⚠️ RIEN d'autre ne s'anime (Kai : GMod peine) : seule la jauge avance, 30 fois par seconde
+    var last = Date.now();
     function tick() {
       var now = Date.now(), dt = Math.min(0.1, (now - last) / 1000);
       last = now;
@@ -372,7 +327,6 @@
       S.creep = Math.max(S.creep, target);
       S.creep += (S.cap - S.creep) * Math.min(1, dt * 0.18);
       var goal = Math.min(1, Math.max(target, S.creep));
-      var avant = S.shown;
       S.shown += (goal - S.shown) * Math.min(1, dt * 5);
       if (goal - S.shown < 0.0005) S.shown = goal;
 
@@ -385,13 +339,7 @@
         var on = p >= (k + 1) * 10;
         if (CRANS[k].classList.contains('on') !== on) CRANS[k].classList.toggle('on', on);
       }
-      // l'étoile du bout tourne quand la jauge avance, au pas de sa vitesse
-      var vitesse = (S.shown - avant) / Math.max(dt, 0.001);
-      if (!calme) rot += dt * (12 + Math.min(260, vitesse * 2600));
-      elEtoile.setAttribute('transform', 'rotate(' + (rot % 360).toFixed(1) + ')');
-
-      poussiere(dt, (now - t0) / 1000);
-      raf(tick);
+      setTimeout(tick, 33);
     }
     tick();
 

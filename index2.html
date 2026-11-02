@@ -249,13 +249,13 @@
       '<b>TAB</b> affiche les joueurs connectés : clique sur un nom pour couper son micro.',
       'Tes objets sont <b>imperdables</b> : ni la mort ni la déconnexion ne te les retirent.'
     ];
+    // UNE astuce par connexion (elle ne tourne pas) ; jamais deux fois de suite la même
+    var avant = -1;
+    try { avant = parseInt(localStorage.getItem('kyzen_ls_astuce'), 10); } catch (e) {}
     var ia = Math.floor(Math.random() * ASTUCES.length);
-    var elA = $('astuceTxt');
-    elA.innerHTML = ASTUCES[ia];
-    setInterval(function () {             // (sans fondu : GMod n'aime pas les animations)
-      ia = (ia + 1) % ASTUCES.length;
-      elA.innerHTML = ASTUCES[ia];
-    }, 7000);
+    if (ia === avant) ia = (ia + 1 + Math.floor(Math.random() * (ASTUCES.length - 1))) % ASTUCES.length;
+    try { localStorage.setItem('kyzen_ls_astuce', String(ia)); } catch (e) {}
+    $('astuceTxt').innerHTML = ASTUCES[ia];
 
     // ------------------------------------------------------------------ l'avancement (API de chargement GMod)
     // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage, Lua)

@@ -28,19 +28,19 @@
   body { color: var(--texte); font-family: "Hind", "Segoe UI", sans-serif; font-weight: 600; }
 
   /* le fond : l'illustration, qui respire très lentement */
-  #bg { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 40%;
+  #bg { position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 40%;
         animation: souffle 34s ease-in-out infinite alternate; }
   @keyframes souffle { from { transform: scale(1); } to { transform: scale(1.06); } }
-  #voile { position: fixed; inset: 0; background: rgba(13, 14, 20, 0.12); }
-  #poussiere { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #voile { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(13, 14, 20, 0.12); }
+  #poussiere { position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 
   /* un cadre : son dessin (SVG, recalculé à chaque taille) derrière son contenu */
   .cadre { position: absolute; }
-  .cadre > svg.dessin { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .cadre > svg.dessin { position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 
   /* ---------------------------------------------------------------- la plaque du bas */
-  /* plus courte que l'écran : le coin bas-droit est à GMod (sa boîte d'étapes Lua s'y affiche par-dessus) */
-  #plaque { left: 4.4vh; width: min(116vh, calc(100% - 60vh)); bottom: 3.8vh; height: 11.4vh;
+  /* le coin bas-droit est à GMod : sa boîte d'étapes (~400 × 75 px, collée au coin) s'affiche par-dessus */
+  #plaque { left: 4.4vh; width: calc(100% - 46vh); bottom: 3.8vh; height: 11.4vh;
             animation: monte 0.9s cubic-bezier(.2, .8, .2, 1) both; }
   @keyframes monte { from { opacity: 0; transform: translateY(2.4vh); } to { opacity: 1; transform: none; } }
 
@@ -87,7 +87,7 @@
          color: var(--texte); --p: 1.6vh;
          clip-path: polygon(var(--p) 0, calc(100% - var(--p)) 0, 100% 50%, calc(100% - var(--p)) 100%, var(--p) 100%, 0 50%);
          background: var(--ligne); }
-  .pil::before { content: ""; position: absolute; inset: 0.16vh; z-index: -1; background: var(--pilule);
+  .pil::before { content: ""; position: absolute; top: 0.16vh; right: 0.16vh; bottom: 0.16vh; left: 0.16vh; z-index: -1; background: var(--pilule);
                  clip-path: polygon(var(--p) 0, calc(100% - var(--p)) 0, 100% 50%, calc(100% - var(--p)) 100%, var(--p) 100%, 0 50%); }
   .pil { isolation: isolate; }
   .pil .lo { position: absolute; top: 50%; width: 0.62vh; height: 0.62vh; margin-top: -0.31vh; transform: rotate(45deg); background: currentColor; }

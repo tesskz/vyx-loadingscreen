@@ -2,111 +2,313 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>VYX</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kyzen</title>
 <style>
-  /* L'image plein écran, telle quelle (jamais déformée, rien de dessiné dessus) ; une fine interface
-     posée en bas, sur la ville sombre : pourcentage, étape, serveur, la jauge et l'araignée de la Brigade. */
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-  body { color: #fff; font-family: "Bree Serif", Georgia, serif; }
-  #bg { position: fixed; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* KYZEN — l'écran de chargement, dans la D.A. « encre et givre » du serveur : cadres à coins coupés au double
+     filet argenté et losanges aux coins, pilules hexagonales, rangée d'étoiles ; marine, argent, lavande.
+     Aplats seulement (pas de dégradé, pas de lueur). */
+  @font-face { font-family: "Lexend"; src: url("assets/fonts/kyzen_lexend.ttf") format("truetype"); font-weight: 100 900; }
+  @font-face { font-family: "Hind"; src: url("assets/fonts/kyzen_hind_semibold.ttf") format("truetype"); font-weight: 600; }
 
-  #ui { position: fixed; left: 4.4vh; right: 4.4vh; bottom: 4.6vh; height: 9vh; text-shadow: 0 0.1vh 0.3vh rgba(0, 0, 0, 0.55); }
-
-  #pct {
-    position: absolute; left: 0; bottom: 3.3vh;
-    font-family: "Bree Serif", Georgia, serif; font-size: 5.6vh; line-height: 0.82; font-variant-numeric: tabular-nums;
+  :root {
+    --fond: rgba(22, 24, 31, 0.86);
+    --fond2: rgb(34, 37, 50);
+    --ligne: rgb(214, 217, 234);
+    --ligne2: rgba(214, 217, 234, 0.37);
+    --pilule: rgb(61, 66, 99);
+    --pilule2: rgb(93, 99, 146);
+    --lav: rgb(179, 184, 232);
+    --lavS: rgb(143, 149, 207);
+    --texte: rgb(238, 240, 248);
+    --dim: rgb(163, 167, 189);
+    --sombre: rgb(27, 29, 44);
   }
-  #pct small { font-size: 2.2vh; margin-left: 0.25vh; vertical-align: top; }
-  #etat { position: absolute; left: 14vh; bottom: 3.5vh; right: 42%; white-space: nowrap; }
-  #phase { font-family: "Bree Serif", Georgia, serif; font-size: 2.1vh; letter-spacing: 0.14em; text-transform: uppercase; }
-  #detail { font-size: 1.3vh; margin-top: 0.45vh; overflow: hidden; text-overflow: ellipsis; opacity: 0.6; }
-  #infos { position: absolute; right: 0; bottom: 3.5vh; text-align: right; font-size: 1.3vh; line-height: 1.6; }
-  #infos b { display: block; font-family: "Bree Serif", Georgia, serif; font-weight: normal; font-size: 2.1vh;
-             letter-spacing: 0.1em; line-height: 1.1; text-transform: uppercase; }
-  #infos span { opacity: 0.6; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0d0e14; }
+  body { color: var(--texte); font-family: "Hind", "Segoe UI", sans-serif; font-weight: 600; }
 
-  /* la jauge : un trait fin */
-  #jauge { position: absolute; left: 0; right: 0; bottom: 0; height: 0.42vh; background: rgba(255, 255, 255, 0.2); }
-  #plein { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #fff; }
+  /* le fond : l'illustration, qui respire très lentement */
+  #bg { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 40%;
+        animation: souffle 34s ease-in-out infinite alternate; }
+  @keyframes souffle { from { transform: scale(1); } to { transform: scale(1.06); } }
+  #voile { position: fixed; inset: 0; background: rgba(13, 14, 20, 0.12); }
+  #poussiere { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
-  /* l'araignée : à cheval sur le trait, la tête au bout de la partie remplie */
-  #araignee { position: absolute; left: 0; bottom: -3.49vh; width: 7.4vh; height: 7.4vh; margin-left: -5.3vh; }
-  #araignee svg { width: 100%; height: 100%; overflow: visible; }
+  /* un cadre : son dessin (SVG, recalculé à chaque taille) derrière son contenu */
+  .cadre { position: absolute; }
+  .cadre > svg.dessin { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+
+  /* ---------------------------------------------------------------- la plaque du bas */
+  #plaque { left: 4.4vh; right: 4.4vh; bottom: 3.8vh; height: 14.6vh;
+            animation: monte 0.9s cubic-bezier(.2, .8, .2, 1) both; }
+  @keyframes monte { from { opacity: 0; transform: translateY(2.4vh); } to { opacity: 1; transform: none; } }
+
+  #etoiles { position: absolute; left: 50%; top: 0; width: 30vh; height: 6vh; margin: -3vh 0 0 -15vh; overflow: visible; }
+  #etoiles .e { transform-box: fill-box; transform-origin: center; animation: pop 0.5s cubic-bezier(.3, 1.6, .5, 1) both; }
+  @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+  #pct { position: absolute; left: 4.2vh; top: 2.1vh; font-family: "Lexend", sans-serif; font-weight: 600;
+         font-size: 7.4vh; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  #pct small { font-size: 2.6vh; font-weight: 500; margin-left: 0.3vh; vertical-align: 3.9vh; color: var(--lav); }
+
+  #etat { position: absolute; left: 21vh; top: 3vh; right: 48%; }
+  #phase { font-family: "Lexend", sans-serif; font-weight: 600; font-size: 2.3vh; letter-spacing: 0.16em; text-transform: uppercase; }
+  #detail { font-size: 1.45vh; color: var(--dim); margin-top: 0.7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  #infos { position: absolute; right: 4.2vh; top: 3vh; text-align: right; max-width: 44%; }
+  #nom { font-family: "Lexend", sans-serif; font-weight: 600; font-size: 2.3vh; letter-spacing: 0.08em; text-transform: uppercase;
+         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #carte { font-size: 1.45vh; color: var(--dim); margin-top: 0.7vh; white-space: nowrap; }
+
+  /* la jauge : un filet, des losanges tous les 10 %, l'étoile au bout */
+  #jauge { position: absolute; left: 5.4vh; right: 5.4vh; bottom: 2.4vh; height: 3vh; }
+  #rail { position: absolute; left: 0; right: 0; top: 50%; height: 0.24vh; margin-top: -0.12vh; background: var(--ligne2); }
+  #plein { position: absolute; left: 0; top: 50%; height: 0.56vh; margin-top: -0.28vh; width: 0; background: var(--lav); }
+  .cran { position: absolute; top: 50%; width: 0.9vh; height: 0.9vh; margin: -0.45vh 0 0 -0.45vh; transform: rotate(45deg);
+          background: var(--sombre); box-shadow: 0 0 0 0.16vh var(--ligne2); }
+  .cran.on { background: var(--texte); box-shadow: 0 0 0 0.16vh var(--texte); }
+  .bout { position: absolute; top: 50%; width: 1.3vh; height: 1.3vh; margin: -0.65vh 0 0 -0.65vh; transform: rotate(45deg); background: #fff; }
+  #pointe { position: absolute; top: 50%; left: 0; width: 4.4vh; height: 4.4vh; margin: -2.2vh 0 0 -2.2vh; }
+  #pointe svg { width: 100%; height: 100%; overflow: visible; }
+
+  /* ---------------------------------------------------------------- l'astuce */
+  #astuce { right: 4.4vh; bottom: 22vh; width: 50vh; height: 10.6vh;
+            animation: monte 0.9s .25s cubic-bezier(.2, .8, .2, 1) both; }
+  #astuce .pil { position: absolute; left: 2.4vh; top: -1.5vh; }
+  #astuceTxt { position: absolute; left: 3vh; right: 3vh; top: 2.6vh; font-size: 1.75vh; line-height: 1.45;
+               transition: opacity .45s, transform .45s; }
+  #astuceTxt.sort { opacity: 0; transform: translateY(0.6vh); }
+  #astuceTxt b { font-family: "Lexend", sans-serif; font-weight: 600; color: var(--lav); }
+
+  /* ---------------------------------------------------------------- les pilules (hexagonales) */
+  .pil { position: absolute; height: 3.2vh; padding: 0 4vh; display: flex; align-items: center; justify-content: center;
+         font-family: "Lexend", sans-serif; font-weight: 600; font-size: 1.45vh; letter-spacing: 0.14em; text-transform: uppercase;
+         color: var(--texte); --p: 1.6vh;
+         clip-path: polygon(var(--p) 0, calc(100% - var(--p)) 0, 100% 50%, calc(100% - var(--p)) 100%, var(--p) 100%, 0 50%);
+         background: var(--ligne); }
+  .pil::before { content: ""; position: absolute; inset: 0.16vh; z-index: -1; background: var(--pilule);
+                 clip-path: polygon(var(--p) 0, calc(100% - var(--p)) 0, 100% 50%, calc(100% - var(--p)) 100%, var(--p) 100%, 0 50%); }
+  .pil { isolation: isolate; }
+  .pil .lo { position: absolute; top: 50%; width: 0.62vh; height: 0.62vh; margin-top: -0.31vh; transform: rotate(45deg); background: currentColor; }
+  .pil .lo.g { left: 1.9vh; } .pil .lo.d { right: 1.9vh; }
+  .pil.lav { color: var(--sombre); }
+  .pil.lav::before { background: var(--lav); }
+
+  #son { position: fixed; right: 4.4vh; top: 3.8vh; cursor: pointer; user-select: none; min-width: 13vh;
+         animation: monte 0.9s .4s cubic-bezier(.2, .8, .2, 1) both; }
+  #son:hover::before { background: var(--pilule2); }
+  #son.off { color: var(--dim); }
+
+  @media (prefers-reduced-motion: reduce) {
+    #bg, #plaque, #astuce, #son, #etoiles .e { animation: none; }
+  }
 </style>
 </head>
 <body>
-  <img id="bg" src="assets/kyzen.png" alt="">
+  <img id="bg" src="assets/kyzen.jpg" alt="">
+  <div id="voile"></div>
+  <canvas id="poussiere"></canvas>
 
-  <div id="ui">
+  <div class="pil" id="son" title="Couper ou remettre la musique"><span class="lo g"></span><span id="sonTxt">Musique</span><span class="lo d"></span></div>
+
+  <div class="cadre" id="astuce" data-cut="1.4">
+    <svg class="dessin"></svg>
+    <div class="pil lav"><span class="lo g"></span>Astuce<span class="lo d"></span></div>
+    <div id="astuceTxt"></div>
+  </div>
+
+  <div class="cadre" id="plaque" data-cut="2.4" data-entete="0">
+    <svg class="dessin"></svg>
+    <svg id="etoiles" viewBox="-150 -30 300 60" aria-hidden="true"></svg>
     <div id="pct">0<small>%</small></div>
     <div id="etat">
       <div id="phase">Connexion</div>
       <div id="detail">en attente du serveur…</div>
     </div>
     <div id="infos">
-      <b id="nom">VYX</b>
-      <span id="carte">Hunter x Hunter RP</span>
+      <div id="nom">Kyzen</div>
+      <div id="carte">Chainsaw Man RP</div>
     </div>
-    <div id="jauge"><div id="plein"></div></div>
-    <div id="araignee">
-      <svg viewBox="-24 -24 48 48" aria-hidden="true">
-        <g id="pattes" fill="#fff" stroke="#0b0b0b" stroke-width="0.7" stroke-linejoin="round"></g>
-        <g fill="#fff" stroke="#0b0b0b" stroke-width="0.8">
-          <path d="M -0.5 0 C -2 -6.6, -11 -7.6, -15 -3.4 C -17.2 -1.2, -17.2 1.2, -15 3.4 C -11 7.6, -2 6.6, -0.5 0 Z"/>
-          <ellipse cx="4.6" cy="0" rx="4.7" ry="3.5"/>
-          <ellipse cx="9.6" cy="0" rx="2.3" ry="2"/>
-          <path d="M 11.2 -1.6 Q 13.6 -2.2 13.4 -0.4 Q 12.4 -0.9 11.4 -0.6 Z M 11.2 1.6 Q 13.6 2.2 13.4 0.4 Q 12.4 0.9 11.4 0.6 Z"/>
-        </g>
-        <text x="-8.4" y="3.3" text-anchor="middle" font-family="Bree Serif, Georgia, serif" font-size="9" fill="#0b0b0b">0</text>
-      </svg>
+    <div id="jauge">
+      <div id="rail"></div>
+      <div id="plein"></div>
+      <div class="bout" style="left:0"></div>
+      <div class="bout" style="left:100%"></div>
+      <div id="pointe"><svg viewBox="-24 -24 48 48" aria-hidden="true"><path id="etoile" fill="#fff"/></svg></div>
     </div>
   </div>
 
-  <!-- Son en boucle. -->
+  <!-- la musique, en boucle -->
   <audio id="snd" loop autoplay preload="auto">
     <source src="assets/kyzen.mp3" type="audio/mpeg">
   </audio>
 
   <script>
   (function () {
-    // ------------------------------------------------------------------ le son (inchangé : 3 %, ré-essais)
+    function $(id) { return document.getElementById(id); }
+    var NS = 'http://www.w3.org/2000/svg';
+
+    // ------------------------------------------------------------------ la musique (3 %, ré-essais, bouton)
     var VOL = 0.03;
-    var a = document.getElementById('snd');
-    if (a) a.volume = VOL;
+    var a = $('snd');
+    var coupe = false;
+    try { coupe = localStorage.getItem('kyzen_ls_muet') === '1'; } catch (e) {}
     function go() {
-      if (!a) return;
+      if (!a || coupe) return;
       a.volume = VOL;
       var p = a.play();
       if (p && p.catch) p.catch(function () {});
     }
+    function majSon() {
+      $('son').classList.toggle('off', coupe);
+      $('sonTxt').textContent = coupe ? 'Musique coupée' : 'Musique';
+    }
+    $('son').addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      coupe = !coupe;
+      try { localStorage.setItem('kyzen_ls_muet', coupe ? '1' : '0'); } catch (e) {}
+      if (coupe) a.pause(); else go();
+      majSon();
+    });
+    majSon();
     go();
     if (a) { a.addEventListener('canplay', go); a.addEventListener('loadeddata', go); }
-    document.addEventListener('DOMContentLoaded', go);
     window.addEventListener('load', go);
     var tries = 0;
     var iv = setInterval(function () {
       go();
       if (++tries > 25 || (a && !a.paused && a.currentTime > 0)) clearInterval(iv);
     }, 400);
-    ['click', 'keydown', 'mousemove', 'touchstart'].forEach(function (e) { document.addEventListener(e, go); });
+    ['click', 'keydown', 'mousemove'].forEach(function (e) { document.addEventListener(e, go); });
 
-    // ------------------------------------------------------------------ éléments
-    function $(id) { return document.getElementById(id); }
-    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein');
-    var elAraignee = $('araignee'), elPattes = $('pattes');
+    // ------------------------------------------------------------------ les formes de la D.A.
+    function losange(x, y, s) { return 'M' + x + ' ' + (y - s) + 'L' + (x + s) + ' ' + y + 'L' + x + ' ' + (y + s) + 'L' + (x - s) + ' ' + y + 'Z'; }
+    function oct(x, y, w, h, c) {
+      return 'M' + (x + c) + ' ' + y + 'L' + (x + w - c) + ' ' + y + 'L' + (x + w) + ' ' + (y + c) + 'L' + (x + w) + ' ' + (y + h - c)
+        + 'L' + (x + w - c) + ' ' + (y + h) + 'L' + (x + c) + ' ' + (y + h) + 'L' + x + ' ' + (y + h - c) + 'L' + x + ' ' + (y + c) + 'Z';
+    }
+    function etoile4(r, ri) {
+      var d = '';
+      for (var i = 0; i < 8; i++) {
+        var t = Math.PI / 4 * i - Math.PI / 2, q = i % 2 ? ri : r;
+        d += (i ? 'L' : 'M') + (Math.cos(t) * q).toFixed(2) + ' ' + (Math.sin(t) * q).toFixed(2);
+      }
+      return d + 'Z';
+    }
+    function el(tag, attrs, parent) {
+      var n = document.createElementNS(NS, tag);
+      for (var k in attrs) n.setAttribute(k, attrs[k]);
+      if (parent) parent.appendChild(n);
+      return n;
+    }
 
-    // ------------------------------------------------------------------ l'avancement
-    // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage,
-    // Lua) n'arrive que par des messages d'état. Chaque étape pose un plancher et un plafond : la jauge
-    // avance d'elle-même vers le plafond (jamais figée), sans le dépasser avant l'étape suivante.
+    // un cadre : fond marine, filet argenté, filet intérieur, un losange blanc à chaque coin
+    function dessinerCadre(c) {
+      var vh = window.innerHeight / 100;
+      var w = c.clientWidth, h = c.clientHeight;
+      var cut = parseFloat(c.getAttribute('data-cut')) * vh;
+      var svg = c.querySelector('svg.dessin');
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+      svg.innerHTML = '';
+      var e = Math.max(1.5, 0.19 * vh), i = 0.65 * vh;
+      el('path', { d: oct(0, 0, w, h, cut), fill: 'rgba(22,24,31,0.93)' }, svg);
+      el('path', { d: oct(e / 2, e / 2, w - e, h - e, cut), fill: 'none', stroke: 'rgb(214,217,234)', 'stroke-width': e, 'stroke-linejoin': 'miter' }, svg);
+      el('path', { d: oct(i, i, w - i * 2, h - i * 2, Math.max(2, cut - 0.3 * vh)), fill: 'none', stroke: 'rgba(214,217,234,0.37)', 'stroke-width': 1 }, svg);
+      var d = 0.5 * vh;
+      [[cut / 2, cut / 2], [w - cut / 2, cut / 2], [cut / 2, h - cut / 2], [w - cut / 2, h - cut / 2]].forEach(function (q) {
+        el('path', { d: losange(q[0], q[1], d), fill: '#fff' }, svg);
+      });
+    }
+    function dessinerTout() {
+      var cs = document.querySelectorAll('.cadre');
+      for (var k = 0; k < cs.length; k++) dessinerCadre(cs[k]);
+    }
+    window.addEventListener('resize', dessinerTout);
+    dessinerTout();
+
+    // la rangée d'étoiles, à cheval sur le haut de la plaque (le centre : l'étoile à quatre branches)
+    (function () {
+      var svg = $('etoiles');
+      var n = 7, mid = 3, pas = 40;
+      for (var k = 0; k < n; k++) {
+        var x = (k - mid) * pas, dd = Math.abs(k - mid);
+        var p = dd === 0 ? el('path', { d: etoile4(26, 6.5), transform: 'translate(' + x + ' 0) rotate(20)' }, svg)
+                         : el('path', { d: losange(x, 0, dd >= mid ? 4.5 : 8.5) }, svg);
+        p.setAttribute('fill', '#fff');
+        p.setAttribute('class', 'e');
+        p.style.animationDelay = (0.5 + dd * 0.09) + 's';
+      }
+    })();
+    $('etoile').setAttribute('d', etoile4(20, 5));
+
+    // les crans de la jauge, tous les 10 %
+    var CRANS = [];
+    for (var k = 1; k <= 9; k++) {
+      var c = document.createElement('div');
+      c.className = 'cran';
+      c.style.left = (k * 10) + '%';
+      $('jauge').insertBefore(c, $('pointe'));
+      CRANS.push(c);
+    }
+
+    // ------------------------------------------------------------------ les astuces
+    var ASTUCES = [
+      'Maintiens <b>C</b> : le menu des pouvoirs, l\'arbre des compétences et l\'inventaire.',
+      'La touche <b>I</b> ouvre ton inventaire : c\'est là que tu équipes ton arme.',
+      'Chaque grade te donne des <b>points de capacité</b> à dépenser dans l\'arbre des compétences.',
+      '<b>Échap</b> ouvre le hub : la boutique, les paramètres et tes personnages.',
+      'Les <b>démons</b> se battent à mains nues ; les <b>chasseurs</b> peuvent manier l\'épée.',
+      '<b>TAB</b> affiche les joueurs connectés : clique sur un nom pour couper son micro.',
+      'Tes objets sont <b>imperdables</b> : ni la mort ni la déconnexion ne te les retirent.'
+    ];
+    var ia = Math.floor(Math.random() * ASTUCES.length);
+    var elA = $('astuceTxt');
+    elA.innerHTML = ASTUCES[ia];
+    setInterval(function () {
+      elA.classList.add('sort');
+      setTimeout(function () {
+        ia = (ia + 1) % ASTUCES.length;
+        elA.innerHTML = ASTUCES[ia];
+        elA.classList.remove('sort');
+      }, 450);
+    }, 7000);
+
+    // ------------------------------------------------------------------ la poussière de givre (petits losanges)
+    var cv = $('poussiere'), cx = cv.getContext('2d');
+    var GRAINS = [];
+    function taille() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+    taille();
+    window.addEventListener('resize', taille);
+    for (var g = 0; g < 34; g++) {
+      GRAINS.push({ x: Math.random(), y: Math.random(), s: 0.18 + Math.random() * 0.4, v: 0.008 + Math.random() * 0.02,
+                    a: 0.12 + Math.random() * 0.35, ph: Math.random() * 6.28 });
+    }
+    var calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function poussiere(dt, t) {
+      var W = cv.width, H = cv.height, vh = H / 100;
+      cx.clearRect(0, 0, W, H);
+      for (var k = 0; k < GRAINS.length; k++) {
+        var p = GRAINS[k];
+        if (!calme) { p.y -= p.v * dt; if (p.y < -0.02) { p.y = 1.02; p.x = Math.random(); } }
+        var x = (p.x + Math.sin(t * 0.4 + p.ph) * 0.006) * W, y = p.y * H, s = p.s * vh;
+        cx.fillStyle = 'rgba(214,217,234,' + p.a + ')';
+        cx.beginPath();
+        cx.moveTo(x, y - s); cx.lineTo(x + s, y); cx.lineTo(x, y + s); cx.lineTo(x - s, y);
+        cx.closePath(); cx.fill();
+      }
+    }
+
+    // ------------------------------------------------------------------ l'avancement (API de chargement GMod)
+    // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage, Lua)
+    // n'arrive que par des messages d'état. Chaque étape pose un plancher et un plafond : la jauge avance
+    // d'elle-même vers le plafond (jamais figée), sans le dépasser avant l'étape suivante.
+    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein'), elPointe = $('pointe'), elEtoile = $('etoile');
     var S = { floor: 0.02, cap: 0.08, total: 0, needed: 0, creep: 0.02, shown: 0 };
     function etape(floor, cap) {
       if (floor > S.floor) S.floor = floor;
       if (cap > S.cap) S.cap = cap;
     }
-    function texte(el, t) { if (el.textContent !== t) el.textContent = t; }
+    function texte(e, t) { if (e.textContent !== t) e.textContent = t; }
 
     var ETATS = [
       [/retriev|parsing|server info/i, 'Connexion', 0.04, 0.12],
@@ -153,49 +355,8 @@
       texte(elDetail, s);
     };
 
-    // ------------------------------------------------------------------ l'araignée : 12 pattes effilées
-    // Vue du dessus, la tête vers la droite (le sens de la jauge). Chaque patte : une cuisse épaisse jusqu'au
-    // genou, puis un tibia qui s'affine en pointe ; les avant visent l'avant, les arrière l'arrière.
-    var SVGNS = 'http://www.w3.org/2000/svg';
-    var PATTES = [];
-    var RACINE = [7.5, 6.3, 5.0, 3.8, 2.6, 1.4];
-    var GENOU  = [[14, 8.5], [11, 12], [6.5, 13.8], [0, 13.8], [-5, 12], [-8.5, 8.5]];
-    var PIED   = [[24, 12.5], [19.5, 19], [9.5, 22.5], [-4, 22.5], [-14, 19], [-21.5, 12.5]];
-    for (var k = 0; k < 6; k++) {
-      for (var side = -1; side <= 1; side += 2) {
-        var el = document.createElementNS(SVGNS, 'path');
-        elPattes.appendChild(el);
-        PATTES.push({ el: el, x0: RACINE[k], kx: GENOU[k], fx: PIED[k], side: side, k: k, phase: (k + (side > 0 ? 1 : 0)) % 2 });
-      }
-    }
-    function nrm(ax, ay, bx, by) { var dx = bx - ax, dy = by - ay, l = Math.sqrt(dx * dx + dy * dy) || 1; return [-dy / l, dx / l]; }
-    function f1(v) { return v.toFixed(2); }
-    var marche = 0;
-    function dessinePattes(bouge) {
-      for (var i = 0; i < PATTES.length; i++) {
-        var P = PATTES[i];
-        var t = marche + P.phase * Math.PI;
-        var sw = bouge ? Math.sin(t) * 2.4 : 0;
-        var lift = bouge ? Math.max(0, Math.cos(t)) * 1.2 : 0;
-        var rx = P.x0, ry = P.side * 2.4;
-        var kx = P.kx[0] + sw * 0.45, ky = P.side * (P.kx[1] - lift * 0.4);
-        var fx = P.fx[0] + sw, fy = P.side * (P.fx[1] - lift);
-        var n0 = nrm(rx, ry, kx, ky), n1 = nrm(kx, ky, fx, fy);
-        var nk = [(n0[0] + n1[0]) / 2, (n0[1] + n1[1]) / 2];
-        var w0 = 1.35, wk = 1.0;
-        // le tibia se courbe un peu vers l'extérieur : point de contrôle décalé
-        var mx = (kx + fx) / 2 + n1[0] * P.side * -0.9, my = (ky + fy) / 2 + n1[1] * P.side * -0.9;
-        var d = 'M' + f1(rx + n0[0] * w0) + ' ' + f1(ry + n0[1] * w0)
-              + 'L' + f1(kx + nk[0] * wk) + ' ' + f1(ky + nk[1] * wk)
-              + 'Q' + f1(mx + n1[0] * 0.45) + ' ' + f1(my + n1[1] * 0.45) + ' ' + f1(fx) + ' ' + f1(fy)
-              + 'Q' + f1(mx - n1[0] * 0.45) + ' ' + f1(my - n1[1] * 0.45) + ' ' + f1(kx - nk[0] * wk) + ' ' + f1(ky - nk[1] * wk)
-              + 'L' + f1(rx - n0[0] * w0) + ' ' + f1(ry - n0[1] * w0) + 'Z';
-        P.el.setAttribute('d', d);
-      }
-    }
-
-    // ------------------------------------------------------------------ boucle
-    var last = Date.now();
+    // ------------------------------------------------------------------ la boucle
+    var last = Date.now(), t0 = last, rot = 0;
     var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
     function tick() {
       var now = Date.now(), dt = Math.min(0.1, (now - last) / 1000);
@@ -204,7 +365,6 @@
       var files = 0;
       if (S.total > 0) files = 0.12 + 0.48 * Math.min(1, (S.total - S.needed) / S.total);
       var target = Math.max(S.floor, files);
-      // la jauge glisse d'elle-même vers le plafond de l'étape (de plus en plus lentement)
       S.creep = Math.max(S.creep, target);
       S.creep += (S.cap - S.creep) * Math.min(1, dt * 0.18);
       var goal = Math.min(1, Math.max(target, S.creep));
@@ -214,32 +374,35 @@
 
       var p = S.shown * 100;
       elPlein.style.width = p.toFixed(2) + '%';
-      elAraignee.style.left = p.toFixed(2) + '%';
+      elPointe.style.left = p.toFixed(2) + '%';
       var n = Math.floor(p);
       if (elPct.firstChild.nodeValue !== String(n)) elPct.firstChild.nodeValue = String(n);
-
-      // elle marche quand la jauge avance, au pas de sa vitesse ; immobile sinon
+      for (var k = 0; k < CRANS.length; k++) {
+        var on = p >= (k + 1) * 10;
+        if (CRANS[k].classList.contains('on') !== on) CRANS[k].classList.toggle('on', on);
+      }
+      // l'étoile du bout tourne quand la jauge avance, au pas de sa vitesse
       var vitesse = (S.shown - avant) / Math.max(dt, 0.001);
-      var bouge = vitesse > 0.002;
-      if (bouge) marche += dt * Math.min(16, 6 + vitesse * 160);
-      dessinePattes(bouge);
+      if (!calme) rot += dt * (12 + Math.min(260, vitesse * 2600));
+      elEtoile.setAttribute('transform', 'rotate(' + (rot % 360).toFixed(1) + ')');
+
+      poussiere(dt, (now - t0) / 1000);
       raf(tick);
     }
-    dessinePattes(false);
     tick();
 
-    // ------------------------------------------------------------------ démo hors jeu : index.html?demo
+    // ------------------------------------------------------------------ démo hors jeu : index2.html?demo
     if (/[?&]demo/.test(location.search)) {
-      var t0 = Date.now(), total = 180;
-      GameDetails('VYX — Hunter x Hunter RP', '', 'rp_yorknew_city', 64, '', 'mangarp');
+      var d0 = Date.now(), total = 180;
+      GameDetails('Kyzen — Chainsaw Man RP', '', 'rp_tokyo_night', 64, '', 'mangarp');
       SetStatusChanged('Retrieving server info...');
       var demo = setInterval(function () {
-        var s = (Date.now() - t0) / 1000;
+        var s = (Date.now() - d0) / 1000;
         if (s > 1.5 && s < 9) {
           SetFilesTotal(total);
           var left = Math.max(0, Math.round(total * (1 - (s - 1.5) / 7.5)));
           SetFilesNeeded(left);
-          DownloadingFile('materials/vyx/hud/hud_bar_v' + (left % 7 + 1) + '.png');
+          DownloadingFile('materials/kyzen/ui/fond_v' + (left % 7 + 1) + '.png');
         } else if (s >= 9 && s < 11) SetStatusChanged('Mounting Addons');
         else if (s >= 11 && s < 12.5) SetStatusChanged('Sending client info...');
         else if (s >= 12.5 && s < 14) SetStatusChanged('Received all Lua files');

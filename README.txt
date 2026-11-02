@@ -58,3 +58,17 @@ VERSION 2 (branche loading-v2)
   remplie de la jauge (ses pattes bougent quand la jauge avance).
 * Apercu hors jeu : ouvrir index.html?demo (simule un chargement).
 ================================================================
+
+--------------------------------------------------------------
+KYZEN (index2.html) — 2 nov.
+--------------------------------------------------------------
+* Le second ecran, celui de Kyzen : sv_loadingurl ".../index2.html"
+* D.A. du serveur (encre et givre) : plaque a coins coupes, double filet
+  argente, losanges, rangee d'etoiles, pilules hexagonales ; aplats.
+* Fond : assets/kyzen.jpg (respire lentement) ; musique : assets/kyzen.mp3
+  (3 %, bouton MUSIQUE en haut a droite pour la couper, retenu).
+* Jauge : crans tous les 10 %, etoile a quatre branches au bout ; une
+  astuce de jeu qui change toutes les 7 s ; poussiere de givre.
+* Polices embarquees : assets/fonts (Lexend, Hind).
+* Apercu hors jeu : index2.html?demo
+================================================================

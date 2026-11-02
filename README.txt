@@ -71,7 +71,6 @@ KYZEN (index2.html) — version sobre (2 nov.)
 * En bas : l'etape, une barre fine rose, le pourcentage, les fichiers ; au-dessus
   de la boite d'etapes de GMod (coin bas-droit).
 * RIEN ne s'anime (GMod peine) : seuls la barre et le chrono changent.
-* Police : Lora (assets/fonts, licence OFL), serif aux racines calligraphiques ;
-  l'italique pour le titre.
+* Polices : assets/fonts (Lexend pour les titres, Open Sans pour le texte).
 * Apercu hors jeu : index2.html?demo
 ================================================================

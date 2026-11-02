@@ -5,108 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kyzen</title>
 <style>
-  /* KYZEN — l'écran de chargement, version SOBRE (2 nov.) : l'illustration voilée, le titre en haut à gauche, le
-     temps et la musique en haut à droite, une astuce, et en bas une barre fine. Bleu glacé et rose, aplats.
-     ⚠️ RIEN ne s'anime (GMod peine) : seuls la barre et le chrono changent. */
-  /* Merienda (semi-manuscrite) pour le titre et les chiffres, Nunito (ronde, douce) pour le texte — choix de Kai */
-  @font-face { font-family: "Merienda"; src: url("assets/fonts/Merienda-Bold.ttf") format("truetype"); font-weight: 700; }
-  @font-face { font-family: "Nunito"; src: url("assets/fonts/Nunito-Medium.ttf") format("truetype"); font-weight: 500; }
-  @font-face { font-family: "Nunito"; src: url("assets/fonts/Nunito-Bold.ttf") format("truetype"); font-weight: 700; }
+  /* KYZEN — l'écran de chargement « BRUME » (2 nov.), AU PIXEL PRÈS de la maquette Figma « Kyzen — Vagabond »,
+     page 06 : la brume claire et les personnages (une image composée, assets/kyzen_brume.jpg, par
+     KYZEN-DATA/tools/fond_chargement.py), KYZEN en Cinzel sur un trait de sang, チェンソーマン, l'astuce (une par
+     connexion), la barre fine rouge et l'étape en cours.
+     La scène fait 1920 × 1080 et suit l'écran (le fond le couvre, le texte y tient). ⚠️ RIEN ne s'anime (GMod
+     peine) : seule la barre avance. */
+  @font-face { font-family: "Cinzel"; src: url("assets/fonts/Cinzel-Bold.ttf") format("truetype"); font-weight: 700; }
+  @font-face { font-family: "Alegreya Sans"; src: url("assets/fonts/AlegreyaSans-Medium.ttf") format("truetype"); font-weight: 500; }
+  @font-face { font-family: "Alegreya Sans"; src: url("assets/fonts/AlegreyaSans-Bold.ttf") format("truetype"); font-weight: 700; }
+  @font-face { font-family: "Yuji Syuku"; src: url("assets/fonts/YujiSyuku-kana.ttf") format("truetype"); font-weight: 400; }
 
-  :root {
-    --rose: rgb(236, 104, 164);
-    --bleu: rgb(160, 182, 255);
-    --texte: rgb(242, 242, 248);
-    --dim: rgba(242, 242, 248, 0.6);
-    --panneau: rgba(13, 13, 22, 0.86);
-  }
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0b0b12; }
-  body { color: var(--texte); font-family: "Nunito", "Segoe UI", sans-serif; font-weight: 500; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #d9d9dc; }
+  .scene { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
+           -webkit-transform-origin: 0 0; transform-origin: 0 0; }
+  #fond { display: block; width: 1920px; height: 1080px; }
+  .ligne { position: absolute; left: 0; width: 1920px; text-align: center; white-space: nowrap; color: #3a3a40; }
 
-  #bg { position: fixed; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
-  #voile { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(8, 8, 16, 0.55); }
-
-  .sur { font-weight: 700; font-size: 1.3vh; letter-spacing: 0.32em; text-transform: uppercase; }
-
-  /* le titre */
-  #titre { position: fixed; left: 22.5vh; top: 9.4vh; }
-  #titre .sur { color: var(--rose); }
-  #titre h1 { margin: 0.6vh 0 0; font-family: "Merienda", serif; font-weight: 700; font-size: 7.4vh; line-height: 1.1;
-              letter-spacing: -0.01em; }
-  #trait { display: flex; gap: 0.5vh; margin-top: 1.4vh; height: 0.36vh; }
-  #trait i { display: block; height: 100%; }
-  #trait i:first-child { width: 17vh; background: var(--rose); }
-  #trait i:last-child { width: 4vh; background: var(--bleu); }
-
-  /* en haut à droite : le temps, la musique */
-  #coin { position: fixed; right: 6vh; top: 7.6vh; text-align: right; }
-  #coin .sur { color: var(--dim); }
-  #temps { font-family: "Merienda", serif; font-weight: 700; font-size: 2.8vh; margin-top: 0.5vh; font-variant-numeric: tabular-nums; }
-  #musique { margin-top: 3vh; cursor: pointer; user-select: none; }
-  #musique .sur { color: var(--bleu); display: inline-flex; align-items: center; gap: 0.8vh; }
-  #barres { display: inline-flex; align-items: flex-end; gap: 0.25vh; height: 1.2vh; }
-  #barres i { display: block; width: 0.32vh; background: var(--bleu); }
-  #barres i:nth-child(1) { height: 60%; } #barres i:nth-child(2) { height: 100%; } #barres i:nth-child(3) { height: 40%; }
-  #morceau { font-family: "Merienda", serif; font-weight: 700; font-size: 1.9vh; margin-top: 0.7vh; }
-  #sonEtat { font-size: 1.3vh; color: var(--dim); margin-top: 0.3vh; }
-  #musique.off #morceau { color: var(--dim); }
-  #musique.off #barres i { background: var(--dim); height: 25%; }
-
-  /* l'astuce */
-  #astuce { position: fixed; left: 8vh; top: 50%; width: 52vh; margin-top: -4.8vh; padding: 2vh 2.6vh 2.2vh;
-            background: var(--panneau); border: 1px solid rgba(236, 104, 164, 0.5); border-radius: 0.9vh; box-sizing: border-box; }
-  #astuce::before { content: ""; position: absolute; left: -0.75vh; top: 50%; width: 1.3vh; height: 1.3vh; margin-top: -0.65vh;
-                    background: var(--bleu); transform: rotate(45deg); }
-  #astuce .sur { color: var(--rose); }
-  #astuceTxt { margin-top: 0.9vh; font-size: 2vh; line-height: 1.5; }
-  #astuceTxt b { color: var(--bleu); font-weight: 700; }
-
-  /* en bas : l'étape, la barre, le pourcentage. Au-dessus de la boîte de GMod (coin bas-droit, ~75 px de haut). */
-  #bas { position: fixed; left: 6vh; right: 6vh; bottom: 8.4vh; height: 7vh; }
-  #phase { position: absolute; left: 0; bottom: 3.2vh; font-weight: 700; font-size: 2.1vh; }
-  #pct { position: absolute; right: 0; bottom: 2.7vh; font-family: "Merienda", serif; font-weight: 700; font-size: 4.2vh;
-         line-height: 1; color: var(--rose); font-variant-numeric: tabular-nums; }
-  #pct small { font-size: 2.4vh; margin-left: 0.15vh; }
-  #rail { position: absolute; left: 0; right: 0; bottom: 1.9vh; height: 0.3vh; background: rgba(242, 242, 248, 0.2); }
-  #plein { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--rose); }
-  #bout { position: absolute; top: 50%; left: 0; width: 1vh; height: 1vh; margin: -0.5vh 0 0 -0.5vh; background: var(--bleu);
-          transform: rotate(45deg); }
-  #detail { position: absolute; left: 0; bottom: 0; right: 40%; font-size: 1.3vh; color: var(--dim);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #infos { position: absolute; right: 0; bottom: 0; font-size: 1.3vh; color: var(--dim); white-space: nowrap; }
+  #trait { position: absolute; left: 640px; top: 789px; width: 640px; height: 72px; }
+  #titre { top: 752px; height: 140px; line-height: 140px; font-family: "Cinzel", serif; font-weight: 700; font-size: 104px;
+           letter-spacing: 14.56px; text-indent: 14.56px; color: #f7f6f2; text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5); }
+  #kana { top: 890px; height: 32px; line-height: 32px; font-family: "Yuji Syuku", serif; font-size: 22px;
+          letter-spacing: 8.8px; text-indent: 8.8px; }
+  #astuce { top: 940px; height: 22px; line-height: 22px; font-family: "Alegreya Sans", sans-serif; font-weight: 700;
+            font-size: 18px; letter-spacing: 0.4px; }
+  #astuce b { color: #9e0f1b; font-weight: 700; }
+  #rail { position: absolute; left: 700px; top: 1000px; width: 520px; height: 2px; background: rgba(58, 58, 64, 0.25); }
+  #plein { position: absolute; left: 0; top: 0; height: 2px; width: 0; background: #9e0f1b; }
+  #etat { top: 1014px; height: 18px; line-height: 18px; font-family: "Alegreya Sans", sans-serif; font-weight: 500; font-size: 15px; }
 </style>
 </head>
 <body>
-  <img id="bg" src="assets/kyzen.jpg" alt="">
-  <div id="voile"></div>
-
-  <div id="titre">
-    <div class="sur">Chainsaw Man RP</div>
-    <h1>Kyzen</h1>
-    <div id="trait"><i></i><i></i></div>
-  </div>
-
-  <div id="coin">
-    <div class="sur">Temps écoulé</div>
-    <div id="temps">0:00</div>
-    <div id="musique" title="Couper ou remettre la musique">
-      <div class="sur"><span id="barres"><i></i><i></i><i></i></span>À l'écoute</div>
-      <div id="morceau"></div>
-      <div id="sonEtat">Clic pour couper</div>
-    </div>
-  </div>
-
-  <div id="astuce">
-    <div class="sur">Astuce</div>
-    <div id="astuceTxt"></div>
-  </div>
-
-  <div id="bas">
-    <div id="phase">Connexion</div>
-    <div id="pct">0<small>%</small></div>
-    <div id="rail"><div id="plein"></div><div id="bout"></div></div>
-    <div id="detail">en attente du serveur…</div>
-    <div id="infos"></div>
+  <div class="scene" id="sceneFond"><img id="fond" src="assets/kyzen_brume.jpg" alt=""></div>
+  <div class="scene" id="scene">
+    <img id="trait" src="assets/trait_sang.png" alt="">
+    <div class="ligne" id="titre">KYZEN</div>
+    <div class="ligne" id="kana">チェンソーマン</div>
+    <div class="ligne" id="astuce"></div>
+    <div id="rail"><div id="plein"></div></div>
+    <div class="ligne" id="etat">Connexion · 0 %</div>
   </div>
 
   <!-- la musique, en boucle -->
@@ -117,32 +54,29 @@
   <script>
   (function () {
     function $(id) { return document.getElementById(id); }
-    var MORCEAU = 'Thème de Kyzen';      // le titre affiché « À l'écoute » (le mp3 n'en porte pas)
 
-    // ------------------------------------------------------------------ la musique (3 %, ré-essais, clic = couper)
+    // ------------------------------------------------------------------ la scène suit l'écran : le fond le couvre, le texte y tient
+    function cadrer() {
+      var w = window.innerWidth, h = window.innerHeight;
+      var couvre = Math.max(w / 1920, h / 1080), tient = Math.min(w / 1920, h / 1080);
+      var f = $('sceneFond'), s = $('scene');
+      f.style.webkitTransform = f.style.transform = 'scale(' + couvre + ')';
+      f.style.left = ((w - 1920 * couvre) / 2) + 'px'; f.style.top = ((h - 1080 * couvre) / 2) + 'px';
+      s.style.webkitTransform = s.style.transform = 'scale(' + tient + ')';
+      s.style.left = ((w - 1920 * tient) / 2) + 'px'; s.style.top = ((h - 1080 * tient) / 2) + 'px';
+    }
+    window.addEventListener('resize', cadrer);
+    cadrer();
+
+    // ------------------------------------------------------------------ la musique (3 %, ré-essais ; un clic ou une touche la lance)
     var VOL = 0.03;
     var a = $('snd');
-    var coupe = false;
-    try { coupe = localStorage.getItem('kyzen_ls_muet') === '1'; } catch (e) {}
     function go() {
-      if (!a || coupe) return;
+      if (!a) return;
       a.volume = VOL;
       var p = a.play();
       if (p && p.catch) p.catch(function () {});
     }
-    function majSon() {
-      $('musique').className = coupe ? 'off' : '';
-      $('sonEtat').textContent = coupe ? 'Coupée · clic pour remettre' : 'Clic pour couper';
-    }
-    $('morceau').textContent = MORCEAU;
-    $('musique').addEventListener('click', function (ev) {
-      ev.stopPropagation();
-      coupe = !coupe;
-      try { localStorage.setItem('kyzen_ls_muet', coupe ? '1' : '0'); } catch (e) {}
-      if (coupe) a.pause(); else go();
-      majSon();
-    });
-    majSon();
     go();
     if (a) { a.addEventListener('canplay', go); a.addEventListener('loadeddata', go); }
     window.addEventListener('load', go);
@@ -153,13 +87,6 @@
     }, 400);
     ['click', 'keydown', 'mousemove'].forEach(function (e) { document.addEventListener(e, go); });
 
-    // ------------------------------------------------------------------ le temps écoulé (une fois par seconde)
-    var debut = Date.now();
-    setInterval(function () {
-      var s = Math.floor((Date.now() - debut) / 1000);
-      $('temps').textContent = Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
-    }, 1000);
-
     // ------------------------------------------------------------------ l'astuce : une par connexion, jamais deux fois de suite la même
     var ASTUCES = [
       'Maintiens <b>C</b> : le menu des pouvoirs, l\'arbre des compétences et l\'inventaire.',
@@ -168,26 +95,26 @@
       '<b>Échap</b> ouvre le hub : la boutique, les paramètres et tes personnages.',
       'Les <b>démons</b> se battent à mains nues ; les <b>chasseurs</b> peuvent manier l\'épée.',
       '<b>TAB</b> affiche les joueurs connectés : clique sur un nom pour couper son micro.',
-      'Tes objets sont <b>imperdables</b> : ni la mort ni la déconnexion ne te les retirent.'
+      'Tes objets sont <b>imperdables</b> : ni la mort ni la déconnexion ne te les retirent.',
+      'La <b>molette</b>, ton arme de combat en main : changer d\'arme.'
     ];
     var avant = -1;
     try { avant = parseInt(localStorage.getItem('kyzen_ls_astuce'), 10); } catch (e) {}
     var ia = Math.floor(Math.random() * ASTUCES.length);
     if (ia === avant) ia = (ia + 1 + Math.floor(Math.random() * (ASTUCES.length - 1))) % ASTUCES.length;
     try { localStorage.setItem('kyzen_ls_astuce', String(ia)); } catch (e) {}
-    $('astuceTxt').innerHTML = ASTUCES[ia];
+    $('astuce').innerHTML = ASTUCES[ia];
 
     // ------------------------------------------------------------------ l'avancement (API de chargement GMod)
     // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage, Lua)
     // n'arrive que par des messages d'état. Chaque étape pose un plancher et un plafond : la barre avance
     // d'elle-même vers le plafond (jamais figée), sans le dépasser avant l'étape suivante.
-    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein'), elBout = $('bout'), elInfos = $('infos');
-    var S = { floor: 0.02, cap: 0.08, total: 0, needed: 0, creep: 0.02, shown: 0, carte: '' };
+    var elEtat = $('etat'), elPlein = $('plein');
+    var S = { floor: 0.02, cap: 0.08, total: 0, needed: 0, creep: 0.02, shown: 0, phase: 'Connexion' };
     function etape(floor, cap) {
       if (floor > S.floor) S.floor = floor;
       if (cap > S.cap) S.cap = cap;
     }
-    function texte(e, t) { if (e.textContent !== t) e.textContent = t; }
 
     var ETATS = [
       [/retriev|parsing|server info/i, 'Connexion', 0.04, 0.12],
@@ -199,26 +126,16 @@
       [/starting lua|lua started/i, 'Démarrage du Lua', 0.92, 0.98]
     ];
 
-    window.GameDetails = function (servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-      var bits = [];
-      if (mapname) bits.push(mapname);
-      if (maxplayers) bits.push(maxplayers + ' places');
-      S.carte = bits.join('  ·  ');
-      etape(0.04, 0.12);
-    };
+    window.GameDetails = function () { etape(0.04, 0.12); };
     window.SetFilesTotal = function (n) { S.total = Math.max(0, +n || 0); };
     window.SetFilesNeeded = function (n) { S.needed = Math.max(0, +n || 0); };
-    window.DownloadingFile = function (f) {
-      texte(elPhase, 'Téléchargement');
-      texte(elDetail, String(f || '').replace(/^.*[\\\/]/, ''));
-      etape(0.12, 0.6);
-    };
+    window.DownloadingFile = function () { S.phase = 'Téléchargement'; etape(0.12, 0.6); };
     window.SetStatusChanged = function (s) {
       s = String(s || '');
       for (var i = 0; i < ETATS.length; i++) {
         var e = ETATS[i];
         if (e[0].test(s)) {
-          texte(elPhase, e[1]);
+          S.phase = e[1];
           etape(e[2], e[3]);
           // « Downloading 3/40 » (Workshop) : la part de l'étape qui est faite
           var m = s.match(/(\d+)\s*\/\s*(\d+)/);
@@ -229,7 +146,6 @@
           break;
         }
       }
-      texte(elDetail, s);
     };
 
     // ------------------------------------------------------------------ la boucle : seule la barre avance (30 i/s)
@@ -245,13 +161,9 @@
       var goal = Math.min(1, Math.max(target, S.creep));
       S.shown += (goal - S.shown) * Math.min(1, dt * 5);
       if (goal - S.shown < 0.0005) S.shown = goal;
-
-      var p = S.shown * 100;
-      elPlein.style.width = p.toFixed(2) + '%';
-      elBout.style.left = p.toFixed(2) + '%';
-      var n = Math.floor(p);
-      if (elPct.firstChild.nodeValue !== String(n)) elPct.firstChild.nodeValue = String(n);
-      texte(elInfos, S.total > 0 ? (S.total - S.needed) + ' / ' + S.total + ' fichiers' : S.carte);
+      elPlein.style.width = (S.shown * 520).toFixed(1) + 'px';
+      var t = S.phase + ' · ' + Math.floor(S.shown * 100) + ' %';
+      if (elEtat.textContent !== t) elEtat.textContent = t;
       setTimeout(tick, 33);
     }
     tick();
@@ -265,9 +177,8 @@
         var s = (Date.now() - d0) / 1000;
         if (s > 1.5 && s < 9) {
           SetFilesTotal(total);
-          var left = Math.max(0, Math.round(total * (1 - (s - 1.5) / 7.5)));
-          SetFilesNeeded(left);
-          DownloadingFile('materials/kyzen/ui/fond_v' + (left % 7 + 1) + '.png');
+          SetFilesNeeded(Math.max(0, Math.round(total * (1 - (s - 1.5) / 7.5))));
+          DownloadingFile('materials/kyzen2/perso_aki.png');
         } else if (s >= 9 && s < 11) { SetFilesTotal(0); SetStatusChanged('Mounting Addons'); }
         else if (s >= 11 && s < 12.5) SetStatusChanged('Sending client info...');
         else if (s >= 12.5 && s < 14) SetStatusChanged('Received all Lua files');

@@ -39,29 +39,30 @@
   .cadre > svg.dessin { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 
   /* ---------------------------------------------------------------- la plaque du bas */
-  #plaque { left: 4.4vh; right: 4.4vh; bottom: 3.8vh; height: 14.6vh;
+  /* plus courte que l'écran : le coin bas-droit est à GMod (sa boîte d'étapes Lua s'y affiche par-dessus) */
+  #plaque { left: 4.4vh; width: min(116vh, calc(100% - 60vh)); bottom: 3.8vh; height: 11.4vh;
             animation: monte 0.9s cubic-bezier(.2, .8, .2, 1) both; }
   @keyframes monte { from { opacity: 0; transform: translateY(2.4vh); } to { opacity: 1; transform: none; } }
 
-  #etoiles { position: absolute; left: 50%; top: 0; width: 30vh; height: 6vh; margin: -3vh 0 0 -15vh; overflow: visible; }
+  #etoiles { position: absolute; left: 50%; top: 0; width: 24vh; height: 4.8vh; margin: -2.4vh 0 0 -12vh; overflow: visible; }
   #etoiles .e { transform-box: fill-box; transform-origin: center; animation: pop 0.5s cubic-bezier(.3, 1.6, .5, 1) both; }
   @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
 
-  #pct { position: absolute; left: 4.2vh; top: 2.1vh; font-family: "Lexend", sans-serif; font-weight: 600;
-         font-size: 7.4vh; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  #pct small { font-size: 2.6vh; font-weight: 500; margin-left: 0.3vh; vertical-align: 3.9vh; color: var(--lav); }
+  #pct { position: absolute; left: 3.6vh; top: 1.5vh; font-family: "Lexend", sans-serif; font-weight: 600;
+         font-size: 5.6vh; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  #pct small { font-size: 2vh; font-weight: 500; margin-left: 0.25vh; vertical-align: 2.9vh; color: var(--lav); }
 
-  #etat { position: absolute; left: 21vh; top: 3vh; right: 48%; }
-  #phase { font-family: "Lexend", sans-serif; font-weight: 600; font-size: 2.3vh; letter-spacing: 0.16em; text-transform: uppercase; }
-  #detail { font-size: 1.45vh; color: var(--dim); margin-top: 0.7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #etat { position: absolute; left: 16vh; top: 1.9vh; right: 46%; }
+  #phase { font-family: "Lexend", sans-serif; font-weight: 600; font-size: 1.9vh; letter-spacing: 0.16em; text-transform: uppercase; }
+  #detail { font-size: 1.3vh; color: var(--dim); margin-top: 0.45vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  #infos { position: absolute; right: 4.2vh; top: 3vh; text-align: right; max-width: 44%; }
-  #nom { font-family: "Lexend", sans-serif; font-weight: 600; font-size: 2.3vh; letter-spacing: 0.08em; text-transform: uppercase;
+  #infos { position: absolute; right: 3.6vh; top: 1.9vh; text-align: right; max-width: 42%; }
+  #nom { font-family: "Lexend", sans-serif; font-weight: 600; font-size: 1.9vh; letter-spacing: 0.08em; text-transform: uppercase;
          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #carte { font-size: 1.45vh; color: var(--dim); margin-top: 0.7vh; white-space: nowrap; }
+  #carte { font-size: 1.3vh; color: var(--dim); margin-top: 0.45vh; white-space: nowrap; }
 
   /* la jauge : un filet, des losanges tous les 10 %, l'étoile au bout */
-  #jauge { position: absolute; left: 5.4vh; right: 5.4vh; bottom: 2.4vh; height: 3vh; }
+  #jauge { position: absolute; left: 4.4vh; right: 4.4vh; bottom: 1.3vh; height: 3vh; }
   #rail { position: absolute; left: 0; right: 0; top: 50%; height: 0.24vh; margin-top: -0.12vh; background: var(--ligne2); }
   #plein { position: absolute; left: 0; top: 50%; height: 0.56vh; margin-top: -0.28vh; width: 0; background: var(--lav); }
   .cran { position: absolute; top: 50%; width: 0.9vh; height: 0.9vh; margin: -0.45vh 0 0 -0.45vh; transform: rotate(45deg);
@@ -72,7 +73,7 @@
   #pointe svg { width: 100%; height: 100%; overflow: visible; }
 
   /* ---------------------------------------------------------------- l'astuce */
-  #astuce { right: 4.4vh; bottom: 22vh; width: 50vh; height: 10.6vh;
+  #astuce { right: 4.4vh; bottom: 30vh; width: 46vh; height: 9.6vh;
             animation: monte 0.9s .25s cubic-bezier(.2, .8, .2, 1) both; }
   #astuce .pil { position: absolute; left: 2.4vh; top: -1.5vh; }
   #astuceTxt { position: absolute; left: 3vh; right: 3vh; top: 2.6vh; font-size: 1.75vh; line-height: 1.45;
@@ -99,6 +100,9 @@
   #son:hover::before { background: var(--pilule2); }
   #son.off { color: var(--dim); }
 
+  /* écran étroit (4:3) : la plaque raccourcit, le serveur s'efface pour laisser l'étape lisible */
+  @media (max-aspect-ratio: 3/2) { #infos { display: none; } #etat { right: 4vh; } }
+
   @media (prefers-reduced-motion: reduce) {
     #bg, #plaque, #astuce, #son, #etoiles .e { animation: none; }
   }
@@ -117,7 +121,7 @@
     <div id="astuceTxt"></div>
   </div>
 
-  <div class="cadre" id="plaque" data-cut="2.4" data-entete="0">
+  <div class="cadre" id="plaque" data-cut="1.8">
     <svg class="dessin"></svg>
     <svg id="etoiles" viewBox="-150 -30 300 60" aria-hidden="true"></svg>
     <div id="pct">0<small>%</small></div>

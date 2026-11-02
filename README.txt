@@ -60,16 +60,17 @@ VERSION 2 (branche loading-v2)
 ================================================================
 
 --------------------------------------------------------------
-KYZEN (index2.html) — 2 nov.
+KYZEN (index2.html) — version sobre (2 nov.)
 --------------------------------------------------------------
 * Le second ecran, celui de Kyzen : sv_loadingurl ".../index2.html"
-* D.A. du serveur (encre et givre) : plaque a coins coupes, double filet
-  argente, losanges, rangee d'etoiles, pilules hexagonales ; aplats.
-* Fond : assets/kyzen.jpg (fixe) ; musique : assets/kyzen.mp3
-  (3 %, bouton MUSIQUE en haut a droite pour la couper, retenu).
-* Jauge : crans tous les 10 %, etoile a quatre branches au bout ; une
-  astuce de jeu, differente a chaque connexion (fixe pendant le chargement). RIEN d'autre ne s'anime (GMod
-  peine avec les animations) : seule la jauge avance.
-* Polices embarquees : assets/fonts (Lexend, Hind).
+* Fond : assets/kyzen.jpg, voile sombre ; musique : assets/kyzen.mp3 (3 %).
+* En haut a gauche : CHAINSAW MAN RP, le titre Kyzen et un trait rose/bleu.
+* En haut a droite : le temps ecoule, la musique a l'ecoute (clic = couper,
+  retenu). Le titre du morceau : la constante MORCEAU dans index2.html.
+* Une astuce par connexion (jamais deux fois de suite la meme).
+* En bas : l'etape, une barre fine rose, le pourcentage, les fichiers ; au-dessus
+  de la boite d'etapes de GMod (coin bas-droit).
+* RIEN ne s'anime (GMod peine) : seuls la barre et le chrono changent.
+* Polices : assets/fonts (Lexend pour les titres, Open Sans pour le texte).
 * Apercu hors jeu : index2.html?demo
 ================================================================

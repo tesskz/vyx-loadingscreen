@@ -8,9 +8,9 @@
   /* KYZEN — l'écran de chargement, version SOBRE (2 nov.) : l'illustration voilée, le titre en haut à gauche, le
      temps et la musique en haut à droite, une astuce, et en bas une barre fine. Bleu glacé et rose, aplats.
      ⚠️ RIEN ne s'anime (GMod peine) : seuls la barre et le chrono changent. */
-  @font-face { font-family: "Lexend"; src: url("assets/fonts/kyzen_lexend.ttf") format("truetype"); font-weight: 100 900; }
-  @font-face { font-family: "Open Sans"; src: url("assets/fonts/OpenSans-SemiBold.ttf") format("truetype"); font-weight: 600; }
-  @font-face { font-family: "Open Sans"; src: url("assets/fonts/OpenSans-Bold.ttf") format("truetype"); font-weight: 700; }
+  /* Lora : un sérif aux racines calligraphiques, doux et très lisible (l'italique pour le titre) */
+  @font-face { font-family: "Lora"; src: url("assets/fonts/Lora.ttf") format("truetype"); font-weight: 400 700; font-style: normal; }
+  @font-face { font-family: "Lora"; src: url("assets/fonts/Lora-Italic.ttf") format("truetype"); font-weight: 400 700; font-style: italic; }
 
   :root {
     --rose: rgb(236, 104, 164);
@@ -20,18 +20,17 @@
     --panneau: rgba(13, 13, 22, 0.86);
   }
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0b0b12; }
-  body { color: var(--texte); font-family: "Open Sans", "Segoe UI", sans-serif; font-weight: 600; }
+  body { color: var(--texte); font-family: "Lora", Georgia, serif; font-weight: 500; font-variant-numeric: lining-nums; }
 
   #bg { position: fixed; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
   #voile { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(8, 8, 16, 0.55); }
 
-  .sur { font-weight: 700; font-size: 1.3vh; letter-spacing: 0.32em; text-transform: uppercase; }
+  .sur { font-weight: 600; font-size: 1.35vh; letter-spacing: 0.26em; text-transform: uppercase; }
 
   /* le titre */
   #titre { position: fixed; left: 22.5vh; top: 9.4vh; }
   #titre .sur { color: var(--rose); }
-  #titre h1 { margin: 0.6vh 0 0; font-family: "Lexend", sans-serif; font-weight: 600; font-size: 7.4vh; line-height: 1;
-              letter-spacing: -0.01em; }
+  #titre h1 { margin: 0.4vh 0 0; font-style: italic; font-weight: 600; font-size: 8.4vh; line-height: 1; letter-spacing: 0; }
   #trait { display: flex; gap: 0.5vh; margin-top: 1.4vh; height: 0.36vh; }
   #trait i { display: block; height: 100%; }
   #trait i:first-child { width: 17vh; background: var(--rose); }
@@ -40,14 +39,14 @@
   /* en haut à droite : le temps, la musique */
   #coin { position: fixed; right: 6vh; top: 7.6vh; text-align: right; }
   #coin .sur { color: var(--dim); }
-  #temps { font-family: "Lexend", sans-serif; font-weight: 600; font-size: 2.8vh; margin-top: 0.5vh; font-variant-numeric: tabular-nums; }
+  #temps { font-weight: 600; font-size: 3vh; margin-top: 0.5vh; font-variant-numeric: tabular-nums; }
   #musique { margin-top: 3vh; cursor: pointer; user-select: none; }
   #musique .sur { color: var(--bleu); display: inline-flex; align-items: center; gap: 0.8vh; }
   #barres { display: inline-flex; align-items: flex-end; gap: 0.25vh; height: 1.2vh; }
   #barres i { display: block; width: 0.32vh; background: var(--bleu); }
   #barres i:nth-child(1) { height: 60%; } #barres i:nth-child(2) { height: 100%; } #barres i:nth-child(3) { height: 40%; }
-  #morceau { font-size: 1.9vh; margin-top: 0.7vh; }
-  #sonEtat { font-size: 1.3vh; color: var(--dim); margin-top: 0.3vh; }
+  #morceau { font-style: italic; font-size: 2.1vh; margin-top: 0.7vh; }
+  #sonEtat { font-size: 1.4vh; color: var(--dim); margin-top: 0.3vh; }
   #musique.off #morceau { color: var(--dim); }
   #musique.off #barres i { background: var(--dim); height: 25%; }
 
@@ -57,22 +56,22 @@
   #astuce::before { content: ""; position: absolute; left: -0.75vh; top: 50%; width: 1.3vh; height: 1.3vh; margin-top: -0.65vh;
                     background: var(--bleu); transform: rotate(45deg); }
   #astuce .sur { color: var(--rose); }
-  #astuceTxt { margin-top: 0.9vh; font-size: 1.95vh; line-height: 1.45; }
+  #astuceTxt { margin-top: 0.9vh; font-size: 2.1vh; line-height: 1.5; }
   #astuceTxt b { color: var(--bleu); font-weight: 700; }
 
   /* en bas : l'étape, la barre, le pourcentage. Au-dessus de la boîte de GMod (coin bas-droit, ~75 px de haut). */
   #bas { position: fixed; left: 6vh; right: 6vh; bottom: 8.4vh; height: 7vh; }
-  #phase { position: absolute; left: 0; bottom: 3.2vh; font-size: 2vh; }
-  #pct { position: absolute; right: 0; bottom: 2.7vh; font-family: "Lexend", sans-serif; font-weight: 600; font-size: 4.2vh;
+  #phase { position: absolute; left: 0; bottom: 3.2vh; font-style: italic; font-size: 2.3vh; }
+  #pct { position: absolute; right: 0; bottom: 2.7vh; font-weight: 600; font-size: 4.4vh;
          line-height: 1; color: var(--rose); font-variant-numeric: tabular-nums; }
   #pct small { font-size: 2.4vh; margin-left: 0.15vh; }
   #rail { position: absolute; left: 0; right: 0; bottom: 1.9vh; height: 0.3vh; background: rgba(242, 242, 248, 0.2); }
   #plein { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--rose); }
   #bout { position: absolute; top: 50%; left: 0; width: 1vh; height: 1vh; margin: -0.5vh 0 0 -0.5vh; background: var(--bleu);
           transform: rotate(45deg); }
-  #detail { position: absolute; left: 0; bottom: 0; right: 40%; font-size: 1.3vh; color: var(--dim);
+  #detail { position: absolute; left: 0; bottom: 0; right: 40%; font-size: 1.4vh; color: var(--dim);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #infos { position: absolute; right: 0; bottom: 0; font-size: 1.3vh; color: var(--dim); white-space: nowrap; }
+  #infos { position: absolute; right: 0; bottom: 0; font-size: 1.4vh; color: var(--dim); white-space: nowrap; font-variant-numeric: lining-nums tabular-nums; }
 </style>
 </head>
 <body>

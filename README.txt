@@ -71,6 +71,7 @@ KYZEN (index2.html) — version sobre (2 nov.)
 * En bas : l'etape, une barre fine rose, le pourcentage, les fichiers ; au-dessus
   de la boite d'etapes de GMod (coin bas-droit).
 * RIEN ne s'anime (GMod peine) : seuls la barre et le chrono changent.
-* Polices : assets/fonts (Lexend pour les titres, Open Sans pour le texte).
+* Polices (choix de Kai) : Merienda (titre, chiffres, morceau) et Nunito (texte),
+  assets/fonts, licences OFL a cote.
 * Apercu hors jeu : index2.html?demo
 ================================================================

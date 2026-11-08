@@ -3,66 +3,76 @@
 <head>
 <meta charset="utf-8">
 <title>VYX</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
 <style>
-  /* L'image plein écran, telle quelle (jamais déformée, rien de dessiné dessus) ; une fine interface
-     posée en bas, sur la ville sombre : pourcentage, étape, serveur, la jauge et l'araignée de la Brigade. */
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-  body { color: #fff; font-family: "Bree Serif", Georgia, serif; }
-  #bg { position: fixed; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* VYX — loading screen v3 (8 nov.). Consigne de Kai : rien des motifs existants (ni Hatsu, ni Échap), le thème
+     sombre, un fond avec des silhouettes noires « à la Hunter », un peu forêt. Fond : les quatre héros en silhouette
+     devant la lune (trouvé via Pinterest) + une lisière de sapins en silhouette à gauche (loading_ref/fond_compose.py).
+     Interface à gauche, dans le ciel : logo, jauge d'un trait, astuce. Rien d'animé sauf la jauge.
+     Ancienne page : index_chrollo.html. Aperçu : index.html?demo */
+  @font-face { font-family: "Michroma"; src: url("assets/fonts/Michroma-Regular.ttf"); }
+  @font-face { font-family: "Cinzel Decorative"; font-weight: 700; src: url("assets/fonts/CinzelDecorative-Bold.ttf"); }
 
-  #ui { position: fixed; left: 4.4vh; right: 4.4vh; bottom: 4.6vh; height: 9vh; text-shadow: 0 0.1vh 0.3vh rgba(0, 0, 0, 0.55); }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #08070c; }
+  #fond { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
+  #voile { position: fixed; inset: 0; background: rgba(4, 3, 8, 0.28); }
+  body { color: #f2f3f5; font-family: "Bree Serif", Georgia, serif; }
 
-  #pct {
-    position: absolute; left: 0; bottom: 3.3vh;
-    font-family: "Bree Serif", Georgia, serif; font-size: 5.6vh; line-height: 0.82; font-variant-numeric: tabular-nums;
-  }
-  #pct small { font-size: 2.2vh; margin-left: 0.25vh; vertical-align: top; }
-  #etat { position: absolute; left: 14vh; bottom: 3.5vh; right: 42%; white-space: nowrap; }
-  #phase { font-family: "Bree Serif", Georgia, serif; font-size: 2.1vh; letter-spacing: 0.14em; text-transform: uppercase; }
-  #detail { font-size: 1.3vh; margin-top: 0.45vh; overflow: hidden; text-overflow: ellipsis; opacity: 0.6; }
-  #infos { position: absolute; right: 0; bottom: 3.5vh; text-align: right; font-size: 1.3vh; line-height: 1.6; }
-  #infos b { display: block; font-family: "Bree Serif", Georgia, serif; font-weight: normal; font-size: 2.1vh;
-             letter-spacing: 0.1em; line-height: 1.1; text-transform: uppercase; }
-  #infos span { opacity: 0.6; }
+  /* grain fixe (bruit, sans dégradé) */
+  #grain { position: fixed; inset: 0; opacity: 0.075; pointer-events: none;
+           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
-  /* la jauge : un trait fin */
-  #jauge { position: absolute; left: 0; right: 0; bottom: 0; height: 0.42vh; background: rgba(255, 255, 255, 0.2); }
-  #plein { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #fff; }
+  /* le cadre : un filet, et des coins plus marqués */
+  #cadre { position: fixed; inset: 3.6vh; border: 1px solid rgba(255, 255, 255, 0.07); }
+  .coin { position: absolute; width: 2.4vh; height: 2.4vh; border: 0 solid rgba(255, 255, 255, 0.55); }
+  .coin.hg { left: -1px; top: -1px; border-left-width: 1px; border-top-width: 1px; }
+  .coin.hd { right: -1px; top: -1px; border-right-width: 1px; border-top-width: 1px; }
+  .coin.bg { left: -1px; bottom: -1px; border-left-width: 1px; border-bottom-width: 1px; }
+  .coin.bd { right: -1px; bottom: -1px; border-right-width: 1px; border-bottom-width: 1px; }
 
-  /* l'araignée : à cheval sur le trait, la tête au bout de la partie remplie */
-  #araignee { position: absolute; left: 0; bottom: -3.49vh; width: 7.4vh; height: 7.4vh; margin-left: -5.3vh; }
-  #araignee svg { width: 100%; height: 100%; overflow: visible; }
+  .petit { font-family: "Michroma", sans-serif; font-size: 1.15vh; letter-spacing: 0.36em; text-transform: uppercase; }
+  #hg { position: fixed; left: 7vh; top: 6.6vh; color: rgba(255, 255, 255, 0.5); }
+  #hd { position: fixed; right: 7vh; top: 6.6vh; color: rgba(255, 255, 255, 0.5); text-align: right; letter-spacing: 0.2em; }
+
+  /* le centre */
+  #centre { position: fixed; left: 9vh; top: 46%; transform: translateY(-50%); width: 50vh; }
+  #logo { height: 13vh; display: flex; align-items: center; justify-content: flex-start; }
+  #logo img { max-height: 100%; max-width: 100%; display: block; }
+  /* le VYX écrit (tant que le PNG du logo n'est pas dans assets/) : Cinzel Decorative, choix de Kai */
+  #logo b { font-family: "Cinzel Decorative", Georgia, serif; font-weight: 700; font-size: 12vh; letter-spacing: 0.04em; line-height: 1; }
+
+  #charge { margin-top: 7.4vh; }
+  #haut { display: flex; justify-content: space-between; align-items: baseline; color: rgba(255, 255, 255, 0.8); }
+  #pct { font-variant-numeric: tabular-nums; letter-spacing: 0.12em; }
+  #jauge { position: relative; margin-top: 1.5vh; height: 1px; background: rgba(255, 255, 255, 0.14); }
+  #plein { position: absolute; left: 0; top: -0.5px; height: 2px; width: 0; background: #fff; }
+  #detail { margin-top: 1.5vh; font-size: 1.45vh; color: rgba(255, 255, 255, 0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* en bas : l'astuce */
+  #astuce { position: fixed; left: 9vh; bottom: 7.4vh; width: 56vh;
+            font-size: 1.6vh; color: rgba(255, 255, 255, 0.6); }
+  #astuce b { display: block; margin-bottom: 0.9vh; color: rgba(255, 255, 255, 0.75); }
 </style>
 </head>
 <body>
-  <img id="bg" src="assets/photo.png" alt="">
+  <img id="fond" src="assets/fond.jpg" alt="">
+  <div id="voile"></div>
+  <div id="grain"></div>
+  <div id="cadre"><i class="coin hg"></i><i class="coin hd"></i><i class="coin bg"></i><i class="coin bd"></i></div>
 
-  <div id="ui">
-    <div id="pct">0<small>%</small></div>
-    <div id="etat">
-      <div id="phase">Connexion</div>
+  <div id="hg" class="petit">Hunter × Hunter · Roleplay</div>
+  <div id="hd" class="petit"><span id="carte"></span></div>
+
+  <div id="centre">
+    <div id="logo"><img src="assets/logo_vyx.png" alt="" onerror="this.parentNode.innerHTML='&lt;b&gt;VYX&lt;/b&gt;'"></div>
+    <div id="charge">
+      <div id="haut" class="petit"><span id="phase">Connexion</span><span id="pct">0 %</span></div>
+      <div id="jauge"><div id="plein"></div></div>
       <div id="detail">en attente du serveur…</div>
     </div>
-    <div id="infos">
-      <b id="nom">VYX</b>
-      <span id="carte">Hunter x Hunter RP</span>
-    </div>
-    <div id="jauge"><div id="plein"></div></div>
-    <div id="araignee">
-      <svg viewBox="-24 -24 48 48" aria-hidden="true">
-        <g id="pattes" fill="#fff" stroke="#0b0b0b" stroke-width="0.7" stroke-linejoin="round"></g>
-        <g fill="#fff" stroke="#0b0b0b" stroke-width="0.8">
-          <path d="M -0.5 0 C -2 -6.6, -11 -7.6, -15 -3.4 C -17.2 -1.2, -17.2 1.2, -15 3.4 C -11 7.6, -2 6.6, -0.5 0 Z"/>
-          <ellipse cx="4.6" cy="0" rx="4.7" ry="3.5"/>
-          <ellipse cx="9.6" cy="0" rx="2.3" ry="2"/>
-          <path d="M 11.2 -1.6 Q 13.6 -2.2 13.4 -0.4 Q 12.4 -0.9 11.4 -0.6 Z M 11.2 1.6 Q 13.6 2.2 13.4 0.4 Q 12.4 0.9 11.4 0.6 Z"/>
-        </g>
-        <text x="-8.4" y="3.3" text-anchor="middle" font-family="Bree Serif, Georgia, serif" font-size="9" fill="#0b0b0b">0</text>
-      </svg>
-    </div>
   </div>
+
+  <div id="astuce"><b class="petit">Astuce</b><span id="astuce-txt"></span></div>
 
   <!-- Son en boucle. -->
   <audio id="snd" loop autoplay preload="auto">
@@ -71,9 +81,26 @@
 
   <script>
   (function () {
+    function $(id) { return document.getElementById(id); }
+
+    // une astuce par connexion (jamais deux fois de suite la même)
+    var ASTUCES = [
+      'F4 ouvre le hub : Hatsu, cosmétique, catégorie de Nen.',
+      'Échap, puis Boutique : les packs de Vyx Points.',
+      'Les tirages Légendaire, Exclusif et Divin sont annoncés à tout le serveur.',
+      'Les Hatsu Exclusifs tournent : ceux qu’on peut tirer changent au fil des rotations.'
+    ];
+    var ia = Math.floor(Math.random() * ASTUCES.length);
+    try {
+      var prec = localStorage.getItem('vyx_ls_astuce');
+      if (prec !== null && ia === +prec) ia = (ia + 1) % ASTUCES.length;
+      localStorage.setItem('vyx_ls_astuce', ia);
+    } catch (e) {}
+    $('astuce-txt').textContent = ASTUCES[ia];
+
     // ------------------------------------------------------------------ le son (inchangé : 3 %, ré-essais)
     var VOL = 0.03;
-    var a = document.getElementById('snd');
+    var a = $('snd');
     if (a) a.volume = VOL;
     function go() {
       if (!a) return;
@@ -92,15 +119,11 @@
     }, 400);
     ['click', 'keydown', 'mousemove', 'touchstart'].forEach(function (e) { document.addEventListener(e, go); });
 
-    // ------------------------------------------------------------------ éléments
-    function $(id) { return document.getElementById(id); }
-    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein');
-    var elAraignee = $('araignee'), elPattes = $('pattes');
-
     // ------------------------------------------------------------------ l'avancement
     // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage,
     // Lua) n'arrive que par des messages d'état. Chaque étape pose un plancher et un plafond : la jauge
     // avance d'elle-même vers le plafond (jamais figée), sans le dépasser avant l'étape suivante.
+    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein');
     var S = { floor: 0.02, cap: 0.08, total: 0, needed: 0, creep: 0.02, shown: 0 };
     function etape(floor, cap) {
       if (floor > S.floor) S.floor = floor;
@@ -118,13 +141,11 @@
       [/starting lua|lua started/i, 'Démarrage du Lua', 0.92, 0.98]
     ];
 
-    window.GameDetails = function (servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-      if (servername) texte($('nom'), servername);
+    window.GameDetails = function (servername, serverurl, mapname, maxplayers) {
       var bits = [];
       if (mapname) bits.push(mapname);
-      if (gamemode) bits.push(gamemode);
       if (maxplayers) bits.push(maxplayers + ' places');
-      if (bits.length) texte($('carte'), bits.join('  ·  '));
+      texte($('carte'), bits.join('  ·  '));
       etape(0.04, 0.12);
     };
     window.SetFilesTotal = function (n) { S.total = Math.max(0, +n || 0); };
@@ -153,54 +174,12 @@
       texte(elDetail, s);
     };
 
-    // ------------------------------------------------------------------ l'araignée : 12 pattes effilées
-    // Vue du dessus, la tête vers la droite (le sens de la jauge). Chaque patte : une cuisse épaisse jusqu'au
-    // genou, puis un tibia qui s'affine en pointe ; les avant visent l'avant, les arrière l'arrière.
-    var SVGNS = 'http://www.w3.org/2000/svg';
-    var PATTES = [];
-    var RACINE = [7.5, 6.3, 5.0, 3.8, 2.6, 1.4];
-    var GENOU  = [[14, 8.5], [11, 12], [6.5, 13.8], [0, 13.8], [-5, 12], [-8.5, 8.5]];
-    var PIED   = [[24, 12.5], [19.5, 19], [9.5, 22.5], [-4, 22.5], [-14, 19], [-21.5, 12.5]];
-    for (var k = 0; k < 6; k++) {
-      for (var side = -1; side <= 1; side += 2) {
-        var el = document.createElementNS(SVGNS, 'path');
-        elPattes.appendChild(el);
-        PATTES.push({ el: el, x0: RACINE[k], kx: GENOU[k], fx: PIED[k], side: side, k: k, phase: (k + (side > 0 ? 1 : 0)) % 2 });
-      }
-    }
-    function nrm(ax, ay, bx, by) { var dx = bx - ax, dy = by - ay, l = Math.sqrt(dx * dx + dy * dy) || 1; return [-dy / l, dx / l]; }
-    function f1(v) { return v.toFixed(2); }
-    var marche = 0;
-    function dessinePattes(bouge) {
-      for (var i = 0; i < PATTES.length; i++) {
-        var P = PATTES[i];
-        var t = marche + P.phase * Math.PI;
-        var sw = bouge ? Math.sin(t) * 2.4 : 0;
-        var lift = bouge ? Math.max(0, Math.cos(t)) * 1.2 : 0;
-        var rx = P.x0, ry = P.side * 2.4;
-        var kx = P.kx[0] + sw * 0.45, ky = P.side * (P.kx[1] - lift * 0.4);
-        var fx = P.fx[0] + sw, fy = P.side * (P.fx[1] - lift);
-        var n0 = nrm(rx, ry, kx, ky), n1 = nrm(kx, ky, fx, fy);
-        var nk = [(n0[0] + n1[0]) / 2, (n0[1] + n1[1]) / 2];
-        var w0 = 1.35, wk = 1.0;
-        // le tibia se courbe un peu vers l'extérieur : point de contrôle décalé
-        var mx = (kx + fx) / 2 + n1[0] * P.side * -0.9, my = (ky + fy) / 2 + n1[1] * P.side * -0.9;
-        var d = 'M' + f1(rx + n0[0] * w0) + ' ' + f1(ry + n0[1] * w0)
-              + 'L' + f1(kx + nk[0] * wk) + ' ' + f1(ky + nk[1] * wk)
-              + 'Q' + f1(mx + n1[0] * 0.45) + ' ' + f1(my + n1[1] * 0.45) + ' ' + f1(fx) + ' ' + f1(fy)
-              + 'Q' + f1(mx - n1[0] * 0.45) + ' ' + f1(my - n1[1] * 0.45) + ' ' + f1(kx - nk[0] * wk) + ' ' + f1(ky - nk[1] * wk)
-              + 'L' + f1(rx - n0[0] * w0) + ' ' + f1(ry - n0[1] * w0) + 'Z';
-        P.el.setAttribute('d', d);
-      }
-    }
-
     // ------------------------------------------------------------------ boucle
     var last = Date.now();
     var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
     function tick() {
       var now = Date.now(), dt = Math.min(0.1, (now - last) / 1000);
       last = now;
-
       var files = 0;
       if (S.total > 0) files = 0.12 + 0.48 * Math.min(1, (S.total - S.needed) / S.total);
       var target = Math.max(S.floor, files);
@@ -208,30 +187,19 @@
       S.creep = Math.max(S.creep, target);
       S.creep += (S.cap - S.creep) * Math.min(1, dt * 0.18);
       var goal = Math.min(1, Math.max(target, S.creep));
-      var avant = S.shown;
       S.shown += (goal - S.shown) * Math.min(1, dt * 5);
       if (goal - S.shown < 0.0005) S.shown = goal;
-
       var p = S.shown * 100;
       elPlein.style.width = p.toFixed(2) + '%';
-      elAraignee.style.left = p.toFixed(2) + '%';
-      var n = Math.floor(p);
-      if (elPct.firstChild.nodeValue !== String(n)) elPct.firstChild.nodeValue = String(n);
-
-      // elle marche quand la jauge avance, au pas de sa vitesse ; immobile sinon
-      var vitesse = (S.shown - avant) / Math.max(dt, 0.001);
-      var bouge = vitesse > 0.002;
-      if (bouge) marche += dt * Math.min(16, 6 + vitesse * 160);
-      dessinePattes(bouge);
+      texte(elPct, Math.floor(p) + ' %');
       raf(tick);
     }
-    dessinePattes(false);
     tick();
 
     // ------------------------------------------------------------------ démo hors jeu : index.html?demo
     if (/[?&]demo/.test(location.search)) {
       var t0 = Date.now(), total = 180;
-      GameDetails('VYX — Hunter x Hunter RP', '', 'rp_yorknew_city', 64, '', 'mangarp');
+      GameDetails('VYX', '', 'rp_yorknew_city', 64);
       SetStatusChanged('Retrieving server info...');
       var demo = setInterval(function () {
         var s = (Date.now() - t0) / 1000;

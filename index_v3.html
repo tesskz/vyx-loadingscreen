@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>VYX</title>
+<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
+<style>
+  /* VYX — loading screen v3 (8 nov.). Consigne de Kai : rien des motifs existants (ni Hatsu, ni Échap), le thème
+     sombre, un fond avec des silhouettes noires « à la Hunter », un peu forêt. Fond : les quatre héros en silhouette
+     devant la lune (trouvé via Pinterest) + une lisière de sapins en silhouette à gauche (loading_ref/fond_compose.py).
+     Interface à gauche, dans le ciel : logo, jauge d'un trait, astuce. Rien d'animé sauf la jauge.
+     Ancienne page : index_chrollo.html. Aperçu : index.html?demo */
+  @font-face { font-family: "Michroma"; src: url("assets/fonts/Michroma-Regular.ttf"); }
+  @font-face { font-family: "Cinzel Decorative"; font-weight: 700; src: url("assets/fonts/CinzelDecorative-Bold.ttf"); }
+
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #08070c; }
+  #fond { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
+  #voile { position: fixed; inset: 0; background: rgba(4, 3, 8, 0.28); }
+  body { color: #f2f3f5; font-family: "Bree Serif", Georgia, serif; }
+
+  /* grain fixe (bruit, sans dégradé) */
+  #grain { position: fixed; inset: 0; opacity: 0.075; pointer-events: none;
+           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  /* le cadre : un filet, et des coins plus marqués */
+  #cadre { position: fixed; inset: 3.6vh; border: 1px solid rgba(255, 255, 255, 0.07); }
+  .coin { position: absolute; width: 2.4vh; height: 2.4vh; border: 0 solid rgba(255, 255, 255, 0.55); }
+  .coin.hg { left: -1px; top: -1px; border-left-width: 1px; border-top-width: 1px; }
+  .coin.hd { right: -1px; top: -1px; border-right-width: 1px; border-top-width: 1px; }
+  .coin.bg { left: -1px; bottom: -1px; border-left-width: 1px; border-bottom-width: 1px; }
+  .coin.bd { right: -1px; bottom: -1px; border-right-width: 1px; border-bottom-width: 1px; }
+
+  .petit { font-family: "Michroma", sans-serif; font-size: 1.15vh; letter-spacing: 0.36em; text-transform: uppercase; }
+  #hg { position: fixed; left: 7vh; top: 6.6vh; color: rgba(255, 255, 255, 0.5); }
+  #hd { position: fixed; right: 7vh; top: 6.6vh; color: rgba(255, 255, 255, 0.5); text-align: right; letter-spacing: 0.2em; }
+
+  /* le centre */
+  #centre { position: fixed; left: 9vh; top: 46%; transform: translateY(-50%); width: 50vh; }
+  #logo { height: 13vh; display: flex; align-items: center; justify-content: flex-start; }
+  #logo img { max-height: 100%; max-width: 100%; display: block; }
+  /* le VYX écrit (tant que le PNG du logo n'est pas dans assets/) : Cinzel Decorative, choix de Kai */
+  #logo b { font-family: "Cinzel Decorative", Georgia, serif; font-weight: 700; font-size: 12vh; letter-spacing: 0.04em; line-height: 1; }
+
+  #charge { margin-top: 7.4vh; }
+  #haut { display: flex; justify-content: space-between; align-items: baseline; color: rgba(255, 255, 255, 0.8); }
+  #pct { font-variant-numeric: tabular-nums; letter-spacing: 0.12em; }
+  #jauge { position: relative; margin-top: 1.5vh; height: 1px; background: rgba(255, 255, 255, 0.14); }
+  #plein { position: absolute; left: 0; top: -0.5px; height: 2px; width: 0; background: #fff; }
+  #detail { margin-top: 1.5vh; font-size: 1.45vh; color: rgba(255, 255, 255, 0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* en bas : l'astuce */
+  #astuce { position: fixed; left: 9vh; bottom: 7.4vh; width: 56vh;
+            font-size: 1.6vh; color: rgba(255, 255, 255, 0.6); }
+  #astuce b { display: block; margin-bottom: 0.9vh; color: rgba(255, 255, 255, 0.75); }
+</style>
+</head>
+<body>
+  <img id="fond" src="assets/fond2.png" alt="">
+  <div id="voile"></div>
+  <div id="grain"></div>
+  <div id="cadre"><i class="coin hg"></i><i class="coin hd"></i><i class="coin bg"></i><i class="coin bd"></i></div>
+
+  <div id="hg" class="petit">Hunter × Hunter · Roleplay</div>
+  <div id="hd" class="petit"><span id="carte"></span></div>
+
+  <div id="centre">
+    <div id="logo"><img src="assets/logo_vyx.png" alt="" onerror="this.parentNode.innerHTML='&lt;b&gt;VYX&lt;/b&gt;'"></div>
+    <div id="charge">
+      <div id="haut" class="petit"><span id="phase">Connexion</span><span id="pct">0 %</span></div>
+      <div id="jauge"><div id="plein"></div></div>
+      <div id="detail">en attente du serveur…</div>
+    </div>
+  </div>
+
+  <div id="astuce"><b class="petit">Astuce</b><span id="astuce-txt"></span></div>
+
+  <!-- Son en boucle. -->
+  <audio id="snd" loop autoplay preload="auto">
+    <source src="assets/son.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+  (function () {
+    function $(id) { return document.getElementById(id); }
+
+    // une astuce par connexion (jamais deux fois de suite la même)
+    var ASTUCES = [
+      'F4 ouvre le hub : Hatsu, cosmétique, catégorie de Nen.',
+      'Échap, puis Boutique : les packs de Vyx Points.',
+      'Les tirages Légendaire, Exclusif et Divin sont annoncés à tout le serveur.',
+      'Les Hatsu Exclusifs tournent : ceux qu’on peut tirer changent au fil des rotations.'
+    ];
+    var ia = Math.floor(Math.random() * ASTUCES.length);
+    try {
+      var prec = localStorage.getItem('vyx_ls_astuce');
+      if (prec !== null && ia === +prec) ia = (ia + 1) % ASTUCES.length;
+      localStorage.setItem('vyx_ls_astuce', ia);
+    } catch (e) {}
+    $('astuce-txt').textContent = ASTUCES[ia];
+
+    // ------------------------------------------------------------------ le son (inchangé : 3 %, ré-essais)
+    var VOL = 0.03;
+    var a = $('snd');
+    if (a) a.volume = VOL;
+    function go() {
+      if (!a) return;
+      a.volume = VOL;
+      var p = a.play();
+      if (p && p.catch) p.catch(function () {});
+    }
+    go();
+    if (a) { a.addEventListener('canplay', go); a.addEventListener('loadeddata', go); }
+    document.addEventListener('DOMContentLoaded', go);
+    window.addEventListener('load', go);
+    var tries = 0;
+    var iv = setInterval(function () {
+      go();
+      if (++tries > 25 || (a && !a.paused && a.currentTime > 0)) clearInterval(iv);
+    }, 400);
+    ['click', 'keydown', 'mousemove', 'touchstart'].forEach(function (e) { document.addEventListener(e, go); });
+
+    // ------------------------------------------------------------------ l'avancement
+    // GMod ne donne un compte de fichiers que pour le téléchargement direct ; le reste (Workshop, montage,
+    // Lua) n'arrive que par des messages d'état. Chaque étape pose un plancher et un plafond : la jauge
+    // avance d'elle-même vers le plafond (jamais figée), sans le dépasser avant l'étape suivante.
+    var elPct = $('pct'), elPhase = $('phase'), elDetail = $('detail'), elPlein = $('plein');
+    var S = { floor: 0.02, cap: 0.08, total: 0, needed: 0, creep: 0.02, shown: 0 };
+    function etape(floor, cap) {
+      if (floor > S.floor) S.floor = floor;
+      if (cap > S.cap) S.cap = cap;
+    }
+    function texte(el, t) { if (el.textContent !== t) el.textContent = t; }
+
+    var ETATS = [
+      [/retriev|parsing|server info/i, 'Connexion', 0.04, 0.12],
+      [/workshop|downloading|t[ée]l[ée]charg/i, 'Téléchargement', 0.12, 0.6],
+      [/mount|montage/i, 'Montage des addons', 0.62, 0.7],
+      [/sending client info/i, 'Envoi des infos', 0.72, 0.8],
+      [/client info sent/i, 'Infos envoyées', 0.8, 0.86],
+      [/lua files|received all/i, 'Fichiers Lua reçus', 0.86, 0.92],
+      [/starting lua|lua started/i, 'Démarrage du Lua', 0.92, 0.98]
+    ];
+
+    window.GameDetails = function (servername, serverurl, mapname, maxplayers) {
+      var bits = [];
+      if (mapname) bits.push(mapname);
+      if (maxplayers) bits.push(maxplayers + ' places');
+      texte($('carte'), bits.join('  ·  '));
+      etape(0.04, 0.12);
+    };
+    window.SetFilesTotal = function (n) { S.total = Math.max(0, +n || 0); };
+    window.SetFilesNeeded = function (n) { S.needed = Math.max(0, +n || 0); };
+    window.DownloadingFile = function (f) {
+      texte(elPhase, 'Téléchargement');
+      texte(elDetail, String(f || '').replace(/^.*[\\\/]/, '') + (S.total ? '   ' + (S.total - S.needed) + ' / ' + S.total : ''));
+      etape(0.12, 0.6);
+    };
+    window.SetStatusChanged = function (s) {
+      s = String(s || '');
+      for (var i = 0; i < ETATS.length; i++) {
+        var e = ETATS[i];
+        if (e[0].test(s)) {
+          texte(elPhase, e[1]);
+          etape(e[2], e[3]);
+          // « Downloading 3/40 » (Workshop) : la part de l'étape qui est faite
+          var m = s.match(/(\d+)\s*\/\s*(\d+)/);
+          if (e[1] === 'Téléchargement' && m && +m[2] > 0) {
+            var f = Math.min(1, +m[1] / +m[2]);
+            etape(0.12 + 0.48 * f, Math.min(0.6, 0.12 + 0.48 * (f + 1 / +m[2])));
+          }
+          break;
+        }
+      }
+      texte(elDetail, s);
+    };
+
+    // ------------------------------------------------------------------ boucle
+    var last = Date.now();
+    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    function tick() {
+      var now = Date.now(), dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      var files = 0;
+      if (S.total > 0) files = 0.12 + 0.48 * Math.min(1, (S.total - S.needed) / S.total);
+      var target = Math.max(S.floor, files);
+      // la jauge glisse d'elle-même vers le plafond de l'étape (de plus en plus lentement)
+      S.creep = Math.max(S.creep, target);
+      S.creep += (S.cap - S.creep) * Math.min(1, dt * 0.18);
+      var goal = Math.min(1, Math.max(target, S.creep));
+      S.shown += (goal - S.shown) * Math.min(1, dt * 5);
+      if (goal - S.shown < 0.0005) S.shown = goal;
+      var p = S.shown * 100;
+      elPlein.style.width = p.toFixed(2) + '%';
+      texte(elPct, Math.floor(p) + ' %');
+      raf(tick);
+    }
+    tick();
+
+    // ------------------------------------------------------------------ démo hors jeu : index.html?demo
+    if (/[?&]demo/.test(location.search)) {
+      var t0 = Date.now(), total = 180;
+      GameDetails('VYX', '', 'rp_yorknew_city', 64);
+      SetStatusChanged('Retrieving server info...');
+      var demo = setInterval(function () {
+        var s = (Date.now() - t0) / 1000;
+        if (s > 1.5 && s < 9) {
+          SetFilesTotal(total);
+          var left = Math.max(0, Math.round(total * (1 - (s - 1.5) / 7.5)));
+          SetFilesNeeded(left);
+          DownloadingFile('materials/vyx/hud/hud_bar_v' + (left % 7 + 1) + '.png');
+        } else if (s >= 9 && s < 11) SetStatusChanged('Mounting Addons');
+        else if (s >= 11 && s < 12.5) SetStatusChanged('Sending client info...');
+        else if (s >= 12.5 && s < 14) SetStatusChanged('Received all Lua files');
+        else if (s >= 14 && s < 16) SetStatusChanged('Starting Lua...');
+        else if (s >= 22) { clearInterval(demo); }
+      }, 250);
+    }
+  })();
+  </script>
+</body>
+</html>

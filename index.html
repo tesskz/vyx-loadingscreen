@@ -3,76 +3,86 @@
 <head>
 <meta charset="utf-8">
 <title>VYX</title>
-<link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
 <style>
-  /* VYX — loading screen v3 (8 nov.). Consigne de Kai : rien des motifs existants (ni Hatsu, ni Échap), le thème
-     sombre, un fond avec des silhouettes noires « à la Hunter », un peu forêt. Fond : les quatre héros en silhouette
-     devant la lune (trouvé via Pinterest) + une lisière de sapins en silhouette à gauche (loading_ref/fond_compose.py).
-     Interface à gauche, dans le ciel : logo, jauge d'un trait, astuce. Rien d'animé sauf la jauge.
-     Ancienne page : index_chrollo.html. Aperçu : index.html?demo */
+  /* VYX — loading screen v4 (12 nov.). La nouvelle identité : noir et blanc, le monogramme V (assets/logo_v.png),
+     Michroma pour les capitales, Chakra Petch pour le texte. Un fond par connexion, tiré parmi cinq lieux de
+     Hunter x Hunter passés en noir et blanc (assets/fonds/), jamais deux fois le même d'affilée ; son nom en légende.
+     Rien d'animé sauf la jauge. Ancienne page : index_v3.html. Aperçu : index.html?demo */
   @font-face { font-family: "Michroma"; src: url("assets/fonts/Michroma-Regular.ttf"); }
-  @font-face { font-family: "Cinzel Decorative"; font-weight: 700; src: url("assets/fonts/CinzelDecorative-Bold.ttf"); }
+  @font-face { font-family: "Chakra Petch"; font-weight: 400; src: url("assets/fonts/ChakraPetch-Regular.ttf"); }
+  @font-face { font-family: "Chakra Petch"; font-weight: 500; src: url("assets/fonts/ChakraPetch-Medium.ttf"); }
+  @font-face { font-family: "Chakra Petch"; font-weight: 600; src: url("assets/fonts/ChakraPetch-SemiBold.ttf"); }
 
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #08070c; }
-  #fond { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; }
-  #voile { position: fixed; inset: 0; background: rgba(4, 3, 8, 0.28); }
-  body { color: #f2f3f5; font-family: "Bree Serif", Georgia, serif; }
+  :root { --blanc: #f1f2f4; --fin: rgba(241, 242, 244, 0.14); --dim: rgba(241, 242, 244, 0.5); --noir: #07080a; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--noir); }
+  body { color: var(--blanc); font-family: "Chakra Petch", sans-serif; font-weight: 400; }
 
-  /* grain fixe (bruit, sans dégradé) */
-  #grain { position: fixed; inset: 0; opacity: 0.075; pointer-events: none;
+  #fond { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.08) brightness(1.35); }
+  /* un voile plus dense à gauche, là où se pose l'interface : par bandes nettes, pas en dégradé */
+  #voile { position: fixed; inset: 0; background: rgba(5, 6, 8, 0.32); }
+  #voile-g { position: fixed; left: 0; top: 0; bottom: 0; width: 46%; background: rgba(5, 6, 8, 0.38); }
+  #grain { position: fixed; inset: 0; opacity: 0.08; pointer-events: none;
            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
-  /* le cadre : un filet, et des coins plus marqués */
-  #cadre { position: fixed; inset: 3.6vh; border: 1px solid rgba(255, 255, 255, 0.07); }
-  .coin { position: absolute; width: 2.4vh; height: 2.4vh; border: 0 solid rgba(255, 255, 255, 0.55); }
+  /* le cadre : un filet et quatre coins */
+  #cadre { position: fixed; inset: 3.6vh; border: 1px solid rgba(255, 255, 255, 0.06); }
+  .coin { position: absolute; width: 2.6vh; height: 2.6vh; border: 0 solid rgba(255, 255, 255, 0.6); }
   .coin.hg { left: -1px; top: -1px; border-left-width: 1px; border-top-width: 1px; }
   .coin.hd { right: -1px; top: -1px; border-right-width: 1px; border-top-width: 1px; }
   .coin.bg { left: -1px; bottom: -1px; border-left-width: 1px; border-bottom-width: 1px; }
   .coin.bd { right: -1px; bottom: -1px; border-right-width: 1px; border-bottom-width: 1px; }
 
-  .petit { font-family: "Michroma", sans-serif; font-size: 1.15vh; letter-spacing: 0.36em; text-transform: uppercase; }
-  #hg { position: fixed; left: 7vh; top: 6.6vh; color: rgba(255, 255, 255, 0.5); }
-  #hd { position: fixed; right: 7vh; top: 6.6vh; color: rgba(255, 255, 255, 0.5); text-align: right; letter-spacing: 0.2em; }
+  .caps { font-family: "Michroma", sans-serif; font-size: 1.12vh; letter-spacing: 0.38em; text-transform: uppercase; }
 
-  /* le centre */
-  #centre { position: fixed; left: 9vh; top: 46%; transform: translateY(-50%); width: 50vh; }
-  #logo { height: 13vh; display: flex; align-items: center; justify-content: flex-start; }
-  #logo img { max-height: 100%; max-width: 100%; display: block; }
-  /* le VYX écrit (tant que le PNG du logo n'est pas dans assets/) : Cinzel Decorative, choix de Kai */
-  #logo b { font-family: "Cinzel Decorative", Georgia, serif; font-weight: 700; font-size: 12vh; letter-spacing: 0.04em; line-height: 1; }
+  /* en haut */
+  #hg { position: fixed; left: 7.4vh; top: 6.8vh; color: var(--dim); }
+  #astuce { position: fixed; right: 7.4vh; top: 6.4vh; width: 44vh; text-align: right; }
+  #astuce .caps { color: var(--dim); }
+  #astuce-txt { display: block; margin-top: 1.2vh; font-size: 1.75vh; line-height: 1.45; color: rgba(241, 242, 244, 0.82); }
 
-  #charge { margin-top: 7.4vh; }
-  #haut { display: flex; justify-content: space-between; align-items: baseline; color: rgba(255, 255, 255, 0.8); }
-  #pct { font-variant-numeric: tabular-nums; letter-spacing: 0.12em; }
-  #jauge { position: relative; margin-top: 1.5vh; height: 1px; background: rgba(255, 255, 255, 0.14); }
-  #plein { position: absolute; left: 0; top: -0.5px; height: 2px; width: 0; background: #fff; }
-  #detail { margin-top: 1.5vh; font-size: 1.45vh; color: rgba(255, 255, 255, 0.45); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* le logo */
+  #marque { position: fixed; left: 9vh; top: 50%; transform: translateY(-58%); }
+  #logo { height: 24vh; display: block; }
+  #logo-txt { display: none; font-family: "Michroma", sans-serif; font-size: 10vh; letter-spacing: 0.1em; }
+  #devise { margin-top: 4.2vh; display: flex; align-items: center; gap: 1.6vh; color: rgba(241, 242, 244, 0.7); }
+  #devise i { display: block; width: 4.4vh; height: 1px; background: var(--blanc); }
 
-  /* en bas : l'astuce */
-  #astuce { position: fixed; left: 9vh; bottom: 7.4vh; width: 56vh;
-            font-size: 1.6vh; color: rgba(255, 255, 255, 0.6); }
-  #astuce b { display: block; margin-bottom: 0.9vh; color: rgba(255, 255, 255, 0.75); }
+  /* en bas : la jauge sur toute la largeur du cadre */
+  #charge { position: fixed; left: 9vh; right: 9vh; bottom: 8.6vh; }
+  #haut { display: flex; justify-content: space-between; align-items: baseline; }
+  #phase { color: var(--blanc); }
+  #pct { font-family: "Chakra Petch", sans-serif; font-weight: 600; font-size: 2.6vh; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+  #jauge { position: relative; margin-top: 1.4vh; height: 1px; background: var(--fin); }
+  #plein { position: absolute; left: 0; top: -1px; height: 3px; width: 0; background: var(--blanc); }
+  #plein::after { content: ""; position: absolute; right: -1px; top: -0.7vh; width: 1px; height: calc(1.4vh + 3px); background: var(--blanc); }
+  #bas { display: flex; justify-content: space-between; margin-top: 1.4vh; font-size: 1.5vh; color: rgba(241, 242, 244, 0.45); }
+  #detail { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+  #lieu { letter-spacing: 0.3em; }
 </style>
 </head>
 <body>
-  <img id="fond" src="assets/fond2.png" alt="">
+  <img id="fond" alt="">
   <div id="voile"></div>
+  <div id="voile-g"></div>
   <div id="grain"></div>
   <div id="cadre"><i class="coin hg"></i><i class="coin hd"></i><i class="coin bg"></i><i class="coin bd"></i></div>
 
-  <div id="hg" class="petit">Hunter × Hunter · Roleplay</div>
-  <div id="hd" class="petit"><span id="carte"></span></div>
+  <div id="hg" class="caps"><span id="carte">Hunter × Hunter · Roleplay</span></div>
 
-  <div id="centre">
-    <div id="logo"><img src="assets/logo_vyx.png" alt="" onerror="this.parentNode.innerHTML='&lt;b&gt;VYX&lt;/b&gt;'"></div>
-    <div id="charge">
-      <div id="haut" class="petit"><span id="phase">Connexion</span><span id="pct">0 %</span></div>
-      <div id="jauge"><div id="plein"></div></div>
-      <div id="detail">en attente du serveur…</div>
-    </div>
+  <div id="astuce"><span class="caps">Astuce</span><span id="astuce-txt"></span></div>
+
+  <div id="marque">
+    <img id="logo" src="assets/logo_v.png" alt="VYX"
+         onerror="this.style.display='none';document.getElementById('logo-txt').style.display='block'">
+    <div id="logo-txt">VYX</div>
+    <div id="devise" class="caps"><i></i><span>Hunter × Hunter</span></div>
   </div>
 
-  <div id="astuce"><b class="petit">Astuce</b><span id="astuce-txt"></span></div>
+  <div id="charge">
+    <div id="haut"><span id="phase" class="caps">Connexion</span><span id="pct">0 %</span></div>
+    <div id="jauge"><div id="plein"></div></div>
+    <div id="bas"><span id="detail">en attente du serveur…</span><span id="lieu" class="caps"></span></div>
+  </div>
 
   <!-- Son en boucle. -->
   <audio id="snd" loop autoplay preload="auto">
@@ -82,23 +92,39 @@
   <script>
   (function () {
     function $(id) { return document.getElementById(id); }
+    function tirage(cle, n) {   // un indice au hasard, jamais deux fois le même d'affilée (par joueur)
+      var i = Math.floor(Math.random() * n);
+      try {
+        var prec = localStorage.getItem(cle);
+        if (prec !== null && i === +prec) i = (i + 1) % n;
+        localStorage.setItem(cle, i);
+      } catch (e) {}
+      return i;
+    }
 
-    // une astuce par connexion (jamais deux fois de suite la même)
+    // ------------------------------------------------------------------ le fond : un lieu par connexion
+    var FONDS = [
+      ['yorknew_nuit', 'Yorknew · la nuit'],
+      ['yorknew_tours', 'Yorknew · les tours'],
+      ['arene_celeste', 'L’Arène Céleste'],
+      ['montagnes_lune', 'Les montagnes'],
+      ['ile_baleine', 'L’île de la Baleine']
+    ];
+    var f = FONDS[tirage('vyx_ls_fond', FONDS.length)];
+    $('fond').src = 'assets/fonds/' + f[0] + '.jpg';
+    $('lieu').textContent = f[1];
+
+    // ------------------------------------------------------------------ une astuce par connexion
     var ASTUCES = [
       'F4 ouvre le hub : Hatsu, cosmétique, catégorie de Nen.',
       'Échap, puis Boutique : les packs de Vyx Points.',
       'Les tirages Légendaire, Exclusif et Divin sont annoncés à tout le serveur.',
-      'Les Hatsu Exclusifs tournent : ceux qu’on peut tirer changent au fil des rotations.'
+      'Les Hatsu Exclusifs tournent : ceux qu’on peut tirer changent au fil des rotations.',
+      'Le menu C regroupe ton personnage, ton escouade et les actions rapides.'
     ];
-    var ia = Math.floor(Math.random() * ASTUCES.length);
-    try {
-      var prec = localStorage.getItem('vyx_ls_astuce');
-      if (prec !== null && ia === +prec) ia = (ia + 1) % ASTUCES.length;
-      localStorage.setItem('vyx_ls_astuce', ia);
-    } catch (e) {}
-    $('astuce-txt').textContent = ASTUCES[ia];
+    $('astuce-txt').textContent = ASTUCES[tirage('vyx_ls_astuce', ASTUCES.length)];
 
-    // ------------------------------------------------------------------ le son (inchangé : 3 %, ré-essais)
+    // ------------------------------------------------------------------ le son (3 %, ré-essais)
     var VOL = 0.03;
     var a = $('snd');
     if (a) a.volume = VOL;
@@ -142,7 +168,7 @@
     ];
 
     window.GameDetails = function (servername, serverurl, mapname, maxplayers) {
-      var bits = [];
+      var bits = ['Hunter × Hunter'];
       if (mapname) bits.push(mapname);
       if (maxplayers) bits.push(maxplayers + ' places');
       texte($('carte'), bits.join('  ·  '));
@@ -150,9 +176,9 @@
     };
     window.SetFilesTotal = function (n) { S.total = Math.max(0, +n || 0); };
     window.SetFilesNeeded = function (n) { S.needed = Math.max(0, +n || 0); };
-    window.DownloadingFile = function (f) {
+    window.DownloadingFile = function (fi) {
       texte(elPhase, 'Téléchargement');
-      texte(elDetail, String(f || '').replace(/^.*[\\\/]/, '') + (S.total ? '   ' + (S.total - S.needed) + ' / ' + S.total : ''));
+      texte(elDetail, String(fi || '').replace(/^.*[\\\/]/, '') + (S.total ? '   ' + (S.total - S.needed) + ' / ' + S.total : ''));
       etape(0.12, 0.6);
     };
     window.SetStatusChanged = function (s) {
@@ -162,11 +188,10 @@
         if (e[0].test(s)) {
           texte(elPhase, e[1]);
           etape(e[2], e[3]);
-          // « Downloading 3/40 » (Workshop) : la part de l'étape qui est faite
           var m = s.match(/(\d+)\s*\/\s*(\d+)/);
           if (e[1] === 'Téléchargement' && m && +m[2] > 0) {
-            var f = Math.min(1, +m[1] / +m[2]);
-            etape(0.12 + 0.48 * f, Math.min(0.6, 0.12 + 0.48 * (f + 1 / +m[2])));
+            var fr = Math.min(1, +m[1] / +m[2]);
+            etape(0.12 + 0.48 * fr, Math.min(0.6, 0.12 + 0.48 * (fr + 1 / +m[2])));
           }
           break;
         }
@@ -176,14 +201,13 @@
 
     // ------------------------------------------------------------------ boucle
     var last = Date.now();
-    var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+    var raf = window.requestAnimationFrame || function (fn) { return setTimeout(fn, 16); };
     function tick() {
       var now = Date.now(), dt = Math.min(0.1, (now - last) / 1000);
       last = now;
       var files = 0;
       if (S.total > 0) files = 0.12 + 0.48 * Math.min(1, (S.total - S.needed) / S.total);
       var target = Math.max(S.floor, files);
-      // la jauge glisse d'elle-même vers le plafond de l'étape (de plus en plus lentement)
       S.creep = Math.max(S.creep, target);
       S.creep += (S.cap - S.creep) * Math.min(1, dt * 0.18);
       var goal = Math.min(1, Math.max(target, S.creep));
@@ -199,7 +223,7 @@
     // ------------------------------------------------------------------ démo hors jeu : index.html?demo
     if (/[?&]demo/.test(location.search)) {
       var t0 = Date.now(), total = 180;
-      GameDetails('VYX', '', 'rp_yorknew_city', 64);
+      GameDetails('VYX', '', 'rp_gx', 16);
       SetStatusChanged('Retrieving server info...');
       var demo = setInterval(function () {
         var s = (Date.now() - t0) / 1000;
